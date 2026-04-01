@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  ops_manager
+  sales_agent
+  viewer
+}
+
+enum PlannerSessionStatus {
+  active
+  handed_off
+  closed
+}
+
+enum MessageRole {
+  user
+  assistant
+  system
+}
+
+enum InquiryStatus {
+  pending
+  triaged
+  replied
+  closed
+}
+
+enum Priority {
+  High
+  Medium
+  Low
+}
+
+enum RunStatus {
+  queued
+  running
+  completed
+  failed
+}
+
+enum AIFeature {
+  planner
+  triage
+  pricing
+}
+
+enum AIRunStatus {
+  success
+  error
+}
+
+model User {
+  id           String       @id @default(uuid()) @db.Uuid
+  email        String       @unique
+  name         String?
+  role         UserRole
+  createdAt    DateTime     @default(now())
+  pricingRuns  PricingRun[]
+}
+
+model PlannerSession {
+  id          String               @id @default(uuid()) @db.Uuid
+  visitorId   String?
+  source      String               @default("web")
+  status      PlannerSessionStatus @default(active)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  messages    PlannerMessage[]
+  handoffs    HandoffRequest[]
+}
+
+model PlannerMessage {
+  id           String         @id @default(uuid()) @db.Uuid
+  sessionId    String         @db.Uuid
+  role         MessageRole
+  content      String
+  provider     String?
+  model        String?
+  inputTokens  Int?
+  outputTokens Int?
+  createdAt    DateTime       @default(now())
+  session      PlannerSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
+model HandoffRequest {
+  id            String         @id @default(uuid()) @db.Uuid
+  sessionId     String         @db.Uuid
+  guestName     String
+  guestEmail    String
+  notes         String?
+  itineraryText String?
+  status        String         @default("created")
+  createdAt     DateTime       @default(now())
+  session       PlannerSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([guestEmail, createdAt])
+}
+
+model Inquiry {
+  id            String        @id @default(uuid()) @db.Uuid
+  source        String
+  senderName    String
+  senderEmail   String?
+  subject       String
+  body          String
+  receivedAt    DateTime      @default(now())
+  unread        Boolean       @default(true)
+  status        InquiryStatus @default(pending)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  triageResult  TriageResult?
+
+  @@unique([senderEmail, subject])
+  @@index([status, receivedAt])
+  @@index([senderEmail])
+}
+
+model TriageResult {
+  id                 String    @id @default(uuid()) @db.Uuid
+  inquiryId          String    @unique @db.Uuid
+  priority           Priority
+  priorityReason     String?
+  tripType           String?
+  duration           String?
+  groupSize          String?
+  budget             String?
+  dates              String?
+  halalRequired      Boolean?
+  urgency            String?
+  summary            String?
+  recommendedPackage String?
+  actions            Json?
+  draftReply         String?
+  rawModelOutput     Json?
+  model              String?
+  createdByRunId     String?   @db.Uuid
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  inquiry            Inquiry   @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@index([priority])
+  @@index([tripType])
+  @@index([halalRequired])
+}
+
+model PricingRun {
+  id          String         @id @default(uuid()) @db.Uuid
+  status      RunStatus      @default(queued)
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  requestedBy String?        @db.Uuid
+  error       String?
+  createdAt   DateTime       @default(now())
+  requester   User?          @relation(fields: [requestedBy], references: [id], onDelete: SetNull)
+  result      PricingResult?
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PricingResult {
+  id             String    @id @default(uuid()) @db.Uuid
+  runId          String    @unique @db.Uuid
+  summary        String?
+  tours          Json?
+  airlines       Json?
+  recommendations Json?
+  rawModelOutput Json?
+  createdAt      DateTime  @default(now())
+  run            PricingRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+}
+
+model AIRun {
+  id           String      @id @default(uuid()) @db.Uuid
+  feature      AIFeature
+  provider     String
+  model        String
+  inputTokens  Int?
+  outputTokens Int?
+  latencyMs    Int?
+  status       AIRunStatus
+  error        String?
+  createdAt    DateTime    @default(now())
+
+  @@index([feature, createdAt])
+}
