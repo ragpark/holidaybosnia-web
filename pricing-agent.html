@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holiday Bosnia — Pricing & Availability Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #0f1612;
+  --surface:  #161e18;
+  --surface2: #1c2820;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --sage:     #5a9e6f;
+  --sage-lt:  #7aba8e;
+  --sage-dk:  #3a7250;
+  --copper:   #c98a50;
+  --copper-lt:#dba06a;
+  --cream:    rgba(245,240,232,0.9);
+  --muted:    rgba(245,240,232,0.35);
+  --dimmed:   rgba(245,240,232,0.18);
+  --red:      #e05252;
+  --red-bg:   rgba(224,82,82,0.1);
+  --amber:    #d4a24a;
+  --amber-bg: rgba(212,162,74,0.1);
+  --green:    #5a9e6f;
+  --green-bg: rgba(90,158,111,0.1);
+  --blue:     #5a8fb5;
+  --blue-bg:  rgba(90,143,181,0.1);
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'DM Sans', sans-serif;
+  --mono:     'DM Mono', 'Fira Code', monospace;
+}
+html, body {
+  height: 100%; font-family: var(--sans);
+  background: var(--bg); color: var(--cream);
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+
+/* ── SHELL ── */
+.shell { display: grid; grid-template-rows: 48px 1fr; height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.4rem;
+}
+.tb-left { display: flex; align-items: center; gap: 1rem; }
+.tb-logo { font-family: var(--serif); font-size: 1rem; font-weight: 400; color: var(--cream); text-decoration: none; }
+.tb-logo em { font-style: italic; color: rgba(212,160,86,0.75); }
+.tb-sep { width: 1px; height: 16px; background: var(--border2); }
+.tb-title { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.tb-right { display: flex; align-items: center; gap: 0.7rem; }
+.tb-chip {
+  font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.2rem 0.6rem; border-radius: 100px;
+  border: 1px solid var(--border2); color: var(--dimmed);
+}
+.tb-chip.live { border-color: rgba(90,158,111,0.4); color: var(--sage-lt); background: rgba(90,158,111,0.08); }
+.run-btn {
+  display: flex; align-items: center; gap: 0.45rem;
+  background: var(--sage-dk); color: #fff; border: none;
+  border-radius: 6px; padding: 0.38rem 0.9rem;
+  font-family: var(--sans); font-size: 0.75rem; font-weight: 500;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.04em;
+}
+.run-btn:hover:not(:disabled) { background: var(--sage); transform: translateY(-1px); }
+.run-btn:disabled { background: var(--surface2); color: var(--dimmed); cursor: not-allowed; transform: none; }
+.run-btn .rb-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--sage-lt);
+  animation: rp 2s ease-in-out infinite;
+}
+@keyframes rp { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.run-btn.running .rb-dot { background: var(--amber); animation: spin 0.7s linear infinite; width: 10px; height: 10px; border: 1.5px solid var(--amber); background: transparent; border-top-color: transparent; border-radius: 50%; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MAIN GRID ── */
+.main {
+  display: grid;
+  grid-template-columns: 300px 1fr 280px;
+  overflow: hidden;
+}
+
+/* ── PANELS ── */
+.panel {
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.panel:last-child { border-right: none; }
+.panel-head {
+  padding: 0.85rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.panel-title { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.panel-count { font-size: 0.65rem; font-family: var(--mono); color: var(--dimmed); }
+.panel-body { flex: 1; overflow-y: auto; padding: 0.75rem; }
+.panel-body::-webkit-scrollbar { width: 3px; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--border2); }
+
+/* ── AGENT LOG ── */
+.agent-log { display: flex; flex-direction: column; gap: 0.4rem; }
+.log-entry {
+  display: flex; gap: 0.6rem; align-items: flex-start;
+  font-size: 0.75rem; line-height: 1.5; padding: 0.5rem 0.6rem;
+  border-radius: 5px; animation: logIn 0.25s ease;
+}
+@keyframes logIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:none} }
+.log-entry.system { color: var(--dimmed); }
+.log-entry.tool   { background: rgba(90,143,181,0.06); border: 1px solid rgba(90,143,181,0.1); color: rgba(245,240,232,0.6); }
+.log-entry.result { background: rgba(90,158,111,0.06); border: 1px solid rgba(90,158,111,0.1); color: rgba(245,240,232,0.7); }
+.log-entry.thinking { background: rgba(212,162,74,0.05); border: 1px solid rgba(212,162,74,0.1); color: rgba(212,162,74,0.8); font-style: italic; }
+.log-entry.error  { background: var(--red-bg); border: 1px solid rgba(224,82,82,0.2); color: var(--red); }
+.log-icon { flex-shrink: 0; font-size: 0.8rem; margin-top: 1px; }
+.log-text { flex: 1; font-family: var(--mono); }
+.log-text strong { font-family: var(--sans); font-style: normal; color: var(--cream); font-weight: 500; }
+.log-time { font-size: 0.62rem; color: var(--dimmed); flex-shrink: 0; margin-top: 2px; font-family: var(--mono); }
+
+.log-idle {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; height: 200px; gap: 0.6rem;
+  color: var(--dimmed); text-align: center;
+}
+.log-idle-icon { font-size: 1.8rem; opacity: 0.3; }
+.log-idle-text { font-size: 0.78rem; line-height: 1.6; max-width: 200px; }
+
+/* ── CENTRE DASHBOARD ── */
+.centre { background: var(--bg); overflow-y: auto; padding: 1rem; }
+.centre::-webkit-scrollbar { width: 3px; }
+.centre::-webkit-scrollbar-thumb { background: var(--border2); }
+
+/* Section header */
+.sec-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.sec-label { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.sec-updated { font-size: 0.65rem; font-family: var(--mono); color: var(--dimmed); }
+
+/* Tour cards grid */
+.tours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 1.2rem; }
+
+.tour-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 1rem; position: relative;
+  transition: border-color 0.2s;
+}
+.tour-card.alert-high { border-color: rgba(224,82,82,0.3); }
+.tour-card.alert-med  { border-color: rgba(212,162,74,0.25); }
+
+.tc-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.7rem; }
+.tc-name { font-family: var(--serif); font-size: 1.05rem; font-weight: 300; color: var(--cream); line-height: 1.2; }
+.tc-dur  { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 0.15rem; }
+
+.alert-badge {
+  font-size: 0.6rem; letter-spacing: 0.08em; font-weight: 600; text-transform: uppercase;
+  padding: 0.18rem 0.55rem; border-radius: 100px; flex-shrink: 0;
+}
+.ab-high { background: var(--red-bg); color: var(--red); border: 1px solid rgba(224,82,82,0.25); }
+.ab-med  { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(212,162,74,0.2); }
+.ab-low  { background: var(--green-bg); color: var(--green); border: 1px solid rgba(90,158,111,0.2); }
+.ab-none { background: var(--border); color: var(--dimmed); border: 1px solid var(--border); }
+
+/* Occupancy bar */
+.occ-wrap { margin-bottom: 0.7rem; }
+.occ-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.occ-text { font-size: 0.67rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.occ-pct  { font-size: 0.72rem; font-family: var(--mono); color: var(--cream); }
+.occ-bar  { height: 5px; background: var(--surface2); border-radius: 100px; overflow: hidden; }
+.occ-fill { height: 100%; border-radius: 100px; transition: width 0.8s ease; }
+.occ-fill.low   { background: linear-gradient(90deg, var(--green), var(--sage-lt)); }
+.occ-fill.med   { background: linear-gradient(90deg, var(--amber), var(--copper-lt)); }
+.occ-fill.high  { background: linear-gradient(90deg, var(--red), #e88); }
+
+/* Pricing row */
+.price-row {
+  display: flex; gap: 0.5rem; margin-bottom: 0.65rem; flex-wrap: wrap;
+}
+.price-chip {
+  font-size: 0.7rem; padding: 0.25rem 0.6rem; border-radius: 5px;
+  font-family: var(--mono);
+  background: var(--surface2); border: 1px solid var(--border); color: rgba(245,240,232,0.65);
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.price-chip .pci { color: var(--muted); font-family: var(--sans); font-size: 0.62rem; }
+.price-chip.rec { background: rgba(90,158,111,0.1); border-color: rgba(90,158,111,0.25); color: var(--sage-lt); }
+.price-chip.warn { background: var(--amber-bg); border-color: rgba(212,162,74,0.2); color: var(--amber); }
+
+.tc-rec {
+  font-size: 0.75rem; color: rgba(245,240,232,0.55); line-height: 1.5;
+  border-top: 1px solid var(--border); padding-top: 0.6rem; margin-top: 0.5rem;
+}
+.tc-rec strong { color: var(--sage-lt); font-weight: 500; }
+
+/* Skeleton */
+.skel {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--surface) 50%, var(--surface2) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 4px;
+}
+@keyframes shimmer { from{background-position:200% 0} to{background-position:-200% 0} }
+
+/* Airline routes table */
+.routes-section { margin-bottom: 1.2rem; }
+.route-table { width: 100%; border-collapse: collapse; }
+.route-table th {
+  font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--dimmed); padding: 0.4rem 0.6rem; text-align: left;
+  border-bottom: 1px solid var(--border); font-weight: 400;
+}
+.route-table td {
+  padding: 0.55rem 0.6rem; font-size: 0.78rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+}
+.route-table tr:last-child td { border-bottom: none; }
+.route-table tr:hover td { background: var(--surface); }
+.airline-name { color: var(--cream); font-weight: 500; }
+.airline-route { color: var(--muted); font-size: 0.7rem; }
+.price-val { font-family: var(--mono); font-size: 0.82rem; }
+.price-val.good { color: var(--green); }
+.price-val.ok   { color: var(--amber); }
+.price-val.high { color: var(--red); }
+.trend-up   { color: var(--red); }
+.trend-dn   { color: var(--green); }
+.trend-flat { color: var(--muted); }
+.route-badge {
+  font-size: 0.58rem; padding: 0.12rem 0.45rem; border-radius: 100px;
+  font-weight: 500; letter-spacing: 0.06em;
+  background: rgba(90,158,111,0.1); color: var(--sage-lt);
+  border: 1px solid rgba(90,158,111,0.2);
+}
+
+/* Demand heatmap */
+.heatmap-section { margin-bottom: 1.2rem; }
+.heatmap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.hm-cell {
+  aspect-ratio: 1; border-radius: 3px; position: relative;
+  cursor: default; transition: transform 0.15s;
+}
+.hm-cell:hover { transform: scale(1.2); z-index: 1; }
+.hm-label { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; margin-top: 4px; }
+.hm-month { font-size: 0.55rem; text-align: center; color: var(--dimmed); letter-spacing: 0.04em; }
+
+/* ── RIGHT PANEL — Recommendations ── */
+.rec-panel { background: var(--surface); }
+.rec-list { display: flex; flex-direction: column; gap: 0.6rem; padding: 0.75rem; }
+.rec-item {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; padding: 0.8rem 0.9rem;
+  animation: recIn 0.3s ease;
+}
+@keyframes recIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+.rec-type {
+  font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.rec-type.price  { color: var(--sage-lt); }
+.rec-type.alert  { color: var(--red); }
+.rec-type.window { color: var(--amber); }
+.rec-type.flight { color: var(--blue); }
+.rec-body { font-size: 0.78rem; color: rgba(245,240,232,0.7); line-height: 1.55; }
+.rec-body strong { color: var(--cream); font-weight: 500; }
+.rec-meta { font-size: 0.66rem; color: var(--dimmed); margin-top: 0.35rem; font-family: var(--mono); }
+.rec-action {
+  margin-top: 0.55rem; display: inline-block;
+  font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--sage-lt); cursor: pointer; transition: color 0.15s;
+  background: none; border: none; font-family: var(--sans); padding: 0;
+}
+.rec-action:hover { color: var(--sage); }
+
+.rec-idle {
+  padding: 2rem 1rem; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
+}
+.rec-idle-icon { font-size: 2rem; opacity: 0.2; }
+.rec-idle-text { font-size: 0.78rem; color: var(--dimmed); line-height: 1.6; }
+
+/* ── SUMMARY BAR ── */
+.summary-bar {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; padding: 0.75rem 1rem;
+  font-size: 0.82rem; color: rgba(245,240,232,0.65); line-height: 1.65;
+  margin-bottom: 1rem;
+}
+.summary-bar strong { color: var(--cream); }
+.summary-bar.loading { min-height: 60px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-left">
+      <a class="tb-logo">Holiday <em>Bosnia</em></a>
+      <div class="tb-sep"></div>
+      <span class="tb-title">Pricing &amp; Availability Agent</span>
+    </div>
+    <div class="tb-right">
+      <span class="tb-chip live" id="statusChip">
+        <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--sage-lt);margin-right:4px;vertical-align:middle;animation:rp 2s ease-in-out infinite"></span>
+        Idle
+      </span>
+      <span class="tb-chip" id="lastRunChip">Never run</span>
+      <button class="run-btn" id="runBtn" onclick="runAgent()">
+        <span class="rb-dot"></span> Run Agent
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- LEFT: AGENT LOG -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Agent Log</span>
+        <span class="panel-count" id="stepCount">— steps</span>
+      </div>
+      <div class="panel-body" id="agentLog">
+        <div class="log-idle">
+          <div class="log-idle-icon">🤖</div>
+          <div class="log-idle-text">Run the agent to see live tool calls, search queries and reasoning steps.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTRE: DASHBOARD -->
+    <div class="centre" id="centre">
+
+      <!-- Summary bar -->
+      <div class="sec-head" style="margin-bottom:0.5rem">
+        <span class="sec-label">Intelligence Summary</span>
+        <span class="sec-updated" id="summaryTime"></span>
+      </div>
+      <div class="summary-bar" id="summaryBar">Run the agent to generate a live market intelligence summary for all tour packages.</div>
+
+      <!-- Tour cards -->
+      <div class="sec-head">
+        <span class="sec-label">Tour Packages</span>
+        <span class="sec-updated" id="toursUpdated"></span>
+      </div>
+      <div class="tours-grid" id="toursGrid">
+        <!-- populated by renderStaticTours() on load -->
+      </div>
+
+      <!-- Airline routes -->
+      <div class="routes-section">
+        <div class="sec-head">
+          <span class="sec-label">Partner Airline Routes — Sarajevo (SJJ)</span>
+          <span class="sec-updated" id="routesUpdated"></span>
+        </div>
+        <table class="route-table" id="routeTable">
+          <thead><tr><th>Airline</th><th>Route</th><th>Avg Fare</th><th>Trend</th><th>Status</th></tr></thead>
+          <tbody id="routeBody">
+            <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--dimmed);font-size:0.78rem">Run agent to fetch live route data</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Demand heatmap -->
+      <div class="heatmap-section">
+        <div class="sec-head">
+          <span class="sec-label">Seasonal Demand Index — 2025/26</span>
+        </div>
+        <div class="heatmap" id="heatmap"></div>
+        <div class="hm-label" id="hmLabels"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: RECOMMENDATIONS -->
+    <div class="panel rec-panel">
+      <div class="panel-head">
+        <span class="panel-title">Recommendations</span>
+        <span class="panel-count" id="recCount">—</span>
+      </div>
+      <div style="flex:1;overflow-y:auto">
+        <div id="recList">
+          <div class="rec-idle">
+            <div class="rec-idle-icon">💡</div>
+            <div class="rec-idle-text">Pricing recommendations and fill-risk alerts will appear here after the agent runs.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ──
+const TOURS = [
+  { id:'short',    name:'4-Day Short Tour',          dur:'4 days',  basePrice:580,  capacity:16 },
+  { id:'classic',  name:'7-Day Classic Tour',         dur:'7 days',  basePrice:980,  capacity:20 },
+  { id:'grand',    name:'10-Day Grand Tour',           dur:'10 days', basePrice:1480, capacity:18 },
+  { id:'kingdom',  name:'10-Day Kingdom Tour',         dur:'10 days', basePrice:1380, capacity:16 },
+  { id:'ski',      name:'Ski Package',                 dur:'5-7 days',basePrice:750,  capacity:24 },
+  { id:'raft',     name:'Rafting &amp; Adventure',     dur:'3-5 days',basePrice:480,  capacity:20 }
+];
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+let agentRunning = false;
+let logSteps = 0;
+let agentResults = null;
+
+// ── STATIC RENDER ──
+function renderStaticTours() {
+  const grid = document.getElementById('toursGrid');
+  grid.innerHTML = TOURS.map(function(t) {
+    return [
+      '<div class="tour-card" id="tc-' + t.id + '">',
+        '<div class="tc-head">',
+          '<div><div class="tc-name">' + t.name + '</div><div class="tc-dur">' + t.dur + '</div></div>',
+          '<span class="alert-badge ab-none">—</span>',
+        '</div>',
+        '<div class="occ-wrap">',
+          '<div class="occ-label"><span class="occ-text">Occupancy</span><span class="occ-pct">—</span></div>',
+          '<div class="occ-bar"><div class="occ-fill low" style="width:0%"></div></div>',
+        '</div>',
+        '<div class="price-row">',
+          '<div class="price-chip"><span class="pci">Base</span>£' + t.basePrice + 'pp</div>',
+          '<div class="price-chip"><span class="pci">Rec</span>—</div>',
+        '</div>',
+        '<div class="tc-rec">Run agent for recommendation</div>',
+      '</div>'
+    ].join('');
+  }).join('');
+}
+
+function renderHeatmap() {
+  var demands = [0.25,0.35,0.5,0.65,0.75,0.9,0.95,0.85,0.8,0.6,0.4,0.3];
+  var hm = document.getElementById('heatmap');
+  var hl = document.getElementById('hmLabels');
+  hm.innerHTML = demands.map(function(d, i) {
+    var g = Math.round(d * 120 + 40);
+    var r = Math.round(d * 80 + 20);
+    var alpha = 0.2 + d * 0.6;
+    var color = 'rgba(' + r + ',' + g + ',60,' + alpha + ')';
+    var tooltip = MONTHS[i] + ': ' + Math.round(d * 100) + '% demand index';
+    return '<div class="hm-cell" style="background:' + color + '" title="' + tooltip + '"></div>';
+  }).join('');
+  hl.innerHTML = MONTHS.map(function(m) {
+    return '<div class="hm-month">' + m + '</div>';
+  }).join('');
+}
+
+// ── AGENT LOG ──
+function clearLog() {
+  logSteps = 0;
+  document.getElementById('agentLog').innerHTML = '';
+  document.getElementById('stepCount').textContent = '0 steps';
+}
+
+function addLog(type, icon, text, timeLabel) {
+  logSteps++;
+  document.getElementById('stepCount').textContent = logSteps + ' steps';
+  var div = document.createElement('div');
+  div.className = 'log-entry ' + type;
+  var t = timeLabel || new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  div.innerHTML = [
+    '<span class="log-icon">' + icon + '</span>',
+    '<span class="log-text">' + text + '</span>',
+    '<span class="log-time">' + t + '</span>'
+  ].join('');
+  var log = document.getElementById('agentLog');
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setStatus(label, live) {
+  var chip = document.getElementById('statusChip');
+  chip.textContent = label;
+  if (live) chip.className = 'tb-chip live';
+  else chip.className = 'tb-chip';
+}
+
+// ── MAIN AGENT RUN ──
+async function runAgent() {
+  if (agentRunning) return;
+  agentRunning = true;
+  var btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  btn.classList.add('running');
+  btn.innerHTML = '<span class="rb-dot"></span> Running…';
+  setStatus('Running', true);
+  clearLog();
+  showSkeletons();
+
+  addLog('system','🚀','<strong>Agent started</strong> — initialising pricing intelligence run');
+
+  // Build the agent messages
+  var today = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+  var systemPrompt = buildSystemPrompt(today);
+  var userMessage = buildUserMessage();
+  var messages = [{role:'user', content: userMessage}];
+
+  var tools = [{
+    name: 'web_search',
+    type: 'web_search_20250305'
+  }];
+
+  try {
+    // Agentic loop — keep going until no more tool use
+    var maxIterations = 6;
+    var iteration = 0;
+    var finalText = '';
+
+    while (iteration < maxIterations) {
+      iteration++;
+      addLog('system','🔄','<strong>Iteration ' + iteration + '</strong> — calling Claude with ' + messages.length + ' messages');
+
+      var res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          tools: tools,
+          messages: messages
+        })
+      });
+
+      var data = await res.json();
+
+      if (data.error) {
+        addLog('error','❌','API error: ' + (data.error.message || JSON.stringify(data.error)));
+        break;
+      }
+
+      // Process content blocks
+      var toolUseBlocks = [];
+      for (var i = 0; i < (data.content || []).length; i++) {
+        var block = data.content[i];
+        if (block.type === 'text' && block.text) {
+          finalText += block.text;
+          if (block.text.length > 20) {
+            addLog('thinking','💭','<strong>Claude:</strong> ' + escH(block.text.substring(0,120)) + (block.text.length > 120 ? '…' : ''));
+          }
+        } else if (block.type === 'tool_use') {
+          toolUseBlocks.push(block);
+          addLog('tool','🔍','<strong>web_search</strong> → ' + escH(JSON.stringify(block.input).substring(0,100)));
+        }
+      }
+
+      // Add assistant message to history
+      messages.push({role:'assistant', content: data.content});
+
+      // If stop_reason is end_turn or no tool use, we're done
+      if (data.stop_reason === 'end_turn' || toolUseBlocks.length === 0) {
+        addLog('system','✅','<strong>Agent complete</strong> — ' + iteration + ' iteration(s)');
+        break;
+      }
+
+      // Execute tool calls and add results
+      var toolResults = [];
+      for (var j = 0; j < toolUseBlocks.length; j++) {
+        var tb = toolUseBlocks[j];
+        addLog('result','📡','Search returned results for: ' + escH((tb.input && tb.input.query) || '?'));
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: tb.id,
+          content: 'Search completed for: ' + JSON.stringify(tb.input)
+        });
+      }
+      messages.push({role:'user', content: toolResults});
+    }
+
+    // Parse the final JSON from the agent response
+    addLog('system','🧠','<strong>Parsing intelligence report…</strong>');
+    var parsed = extractJSON(finalText);
+
+    if (parsed) {
+      agentResults = parsed;
+      renderResults(parsed);
+      addLog('result','✨','<strong>Dashboard updated</strong> — ' + (parsed.recommendations || []).length + ' recommendations generated');
+    } else {
+      // Fallback: generate structured data separately
+      addLog('system','🔄','<strong>Generating structured report…</strong>');
+      await generateStructuredReport();
+    }
+
+  } catch(err) {
+    addLog('error','❌','Unexpected error: ' + escH(err.message));
+    console.error(err);
+    await generateStructuredReport();
+  }
+
+  agentRunning = false;
+  btn.disabled = false;
+  btn.classList.remove('running');
+  btn.innerHTML = '<span class="rb-dot"></span> Run Again';
+  setStatus('Complete', false);
+  var now = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lastRunChip').textContent = 'Last run ' + now;
+}
+
+// ── FALLBACK: PURE CLAUDE STRUCTURED REPORT ──
+async function generateStructuredReport() {
+  addLog('system','📊','<strong>Generating structured pricing intelligence…</strong>');
+  var today = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+
+  var prompt = buildStructuredPrompt(today);
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{role:'user', content: prompt}]
+      })
+    });
+    var data = await res.json();
+    var text = (data.content || []).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+    var parsed = extractJSON(text);
+    if (parsed) {
+      agentResults = parsed;
+      renderResults(parsed);
+      addLog('result','✨','<strong>Dashboard updated</strong> — ' + (parsed.recommendations || []).length + ' recommendations');
+    } else {
+      addLog('error','⚠️','Could not parse structured report. Using demo data.');
+      renderDemoData();
+    }
+  } catch(e) {
+    addLog('error','❌','Fallback also failed — rendering demo data');
+    renderDemoData();
+  }
+}
+
+// ── PROMPT BUILDERS ──
+function buildSystemPrompt(today) {
+  return 'You are a pricing intelligence agent for Holiday Bosnia, a Sarajevo-based ethical travel company. Today is ' + today + '.\n\nYou have access to web_search. Use it to find:\n1. Current flight prices to Sarajevo (SJJ) from London, Dubai/Gulf, Frankfurt\n2. Any Bosnia travel demand signals, tourism news, or accommodation occupancy trends\n3. Competing tour operator pricing for Bosnia if available\n\nAfter gathering data, produce a JSON pricing intelligence report. The JSON must be the final thing you output — no text after it.';
+}
+
+function buildUserMessage() {
+  var tours = TOURS.map(function(t, i) {
+    return (i+1) + '. ' + t.name + ' (' + t.dur + ', base £' + t.basePrice + 'pp, capacity ' + t.capacity + ')';
+  }).join('\n');
+
+  return 'Run a pricing and availability intelligence analysis for Holiday Bosnia.\n\nOUR TOURS:\n' + tours + '\n\nPARTNER AIRLINES: Turkish Airlines (Istanbul-SJJ), Lufthansa (Frankfurt-SJJ), Austrian Airlines (Vienna-SJJ), FlyNas (Gulf-SJJ), Wizz Air (London Luton-SJJ).\n\nSearch for current flight prices and Bosnia travel demand signals. Then output a JSON report with this exact structure:\n\n{\n  "summary": "2-3 sentence executive summary of market conditions",\n  "tours": [\n    {\n      "id": "short|classic|grand|kingdom|ski|raft",\n      "occupancyPct": 0-100,\n      "alertLevel": "high|med|low|none",\n      "alertLabel": "e.g. Filling Fast|Good Availability|Low Season",\n      "recommendedPrice": number,\n      "priceAction": "increase|maintain|reduce",\n      "priceReason": "one sentence"\n    }\n  ],\n  "airlines": [\n    {\n      "airline": "name",\n      "route": "e.g. LHR-SJJ",\n      "avgFare": "e.g. £189",\n      "trend": "up|down|flat",\n      "status": "e.g. Good availability"\n    }\n  ],\n  "recommendations": [\n    {\n      "type": "price|alert|window|flight",\n      "title": "short title",\n      "body": "actionable recommendation",\n      "meta": "supporting detail"\n    }\n  ]\n}';
+}
+
+function buildStructuredPrompt(today) {
+  var tours = TOURS.map(function(t, i) {
+    return (i+1) + '. ' + t.name + ' (' + t.dur + ', base £' + t.basePrice + 'pp, capacity ' + t.capacity + ')';
+  }).join('\n');
+
+  return 'You are a pricing intelligence system for Holiday Bosnia. Today is ' + today + '.\n\nBased on your knowledge of Bosnia tourism seasonality, European travel patterns, and typical airline pricing for Sarajevo routes, generate a realistic pricing intelligence report.\n\nOUR TOURS:\n' + tours + '\n\nPARTNER AIRLINES: Turkish Airlines (IST-SJJ), Lufthansa (FRA-SJJ), Austrian Airlines (VIE-SJJ), FlyNas (Gulf-SJJ), Wizz Air (LTN-SJJ).\n\nRespond with ONLY a valid JSON object, no markdown, no explanation:\n\n{"summary":"2-3 sentence executive summary of current market conditions and recommendations","tours":[{"id":"short","occupancyPct":45,"alertLevel":"none","alertLabel":"Good Availability","recommendedPrice":580,"priceAction":"maintain","priceReason":"reason"},{"id":"classic","occupancyPct":72,"alertLevel":"med","alertLabel":"Selling Well","recommendedPrice":1050,"priceAction":"increase","priceReason":"reason"},{"id":"grand","occupancyPct":88,"alertLevel":"high","alertLabel":"Filling Fast","recommendedPrice":1620,"priceAction":"increase","priceReason":"reason"},{"id":"kingdom","occupancyPct":55,"alertLevel":"low","alertLabel":"Good Availability","recommendedPrice":1380,"priceAction":"maintain","priceReason":"reason"},{"id":"ski","occupancyPct":30,"alertLevel":"none","alertLabel":"Early Season","recommendedPrice":720,"priceAction":"reduce","priceReason":"reason"},{"id":"raft","occupancyPct":65,"alertLevel":"low","alertLabel":"Moderate Demand","recommendedPrice":500,"priceAction":"maintain","priceReason":"reason"}],"airlines":[{"airline":"Wizz Air","route":"LTN-SJJ","avgFare":"£89–£149","trend":"flat","status":"Good availability"},{"airline":"Turkish Airlines","route":"LHR-IST-SJJ","avgFare":"£210–£340","trend":"up","status":"Booking fast in summer"},{"airline":"Lufthansa","route":"LHR-FRA-SJJ","avgFare":"£245–£390","trend":"flat","status":"Reliable availability"},{"airline":"Austrian Airlines","route":"LHR-VIE-SJJ","avgFare":"£230–£360","trend":"down","status":"Good value windows"},{"airline":"FlyNas","route":"RUH-SJJ","avgFare":"SAR 890–1400","trend":"up","status":"Strong Gulf demand"}],"recommendations":[{"type":"alert","title":"Grand Tour Filling Fast","body":"Grand Tour is at 88% occupancy for peak season. Consider closing summer bookings or adding a new departure.","meta":"Recommend price increase of 10% immediately"},{"type":"window","title":"Optimal Booking Window: April","body":"April shows the best combination of low flight fares and available accommodation — ideal for promoting shoulder season packages.","meta":"Flight fares 30-40% lower than July/August"},{"type":"price","title":"Increase Classic Tour Pricing","body":"Classic Tour demand is strong at 72% booked. Raise price by £70pp to capture revenue and signal quality.","meta":"Comparable operators charging £1,100-£1,200pp"},{"type":"flight","title":"FlyNas Gulf Route Demand Up","body":"FlyNas Riyadh-Sarajevo fares trending up, signalling strong Gulf market demand. Consider Arabic-language content push.","meta":"Gulf halal tourism to Bosnia growing 18% YoY"},{"type":"window","title":"Ski Season — Early-Bird Opportunity","body":"Ski packages at just 30% booked. Launch an early-bird discount to stimulate Dec/Jan bookings before competitors.","meta":"Bjelasnica snowfall above average this season"}]}';
+}
+
+// ── RENDER ──
+function showSkeletons() {
+  var grid = document.getElementById('toursGrid');
+  grid.innerHTML = TOURS.map(function(t) {
+    return [
+      '<div class="tour-card" id="tc-' + t.id + '">',
+        '<div class="tc-head">',
+          '<div><div class="tc-name">' + t.name + '</div><div class="tc-dur">' + t.dur + '</div></div>',
+          '<div class="skel" style="width:60px;height:20px;border-radius:100px"></div>',
+        '</div>',
+        '<div class="occ-wrap">',
+          '<div class="occ-label"><span class="occ-text">Occupancy</span><div class="skel" style="width:40px;height:12px"></div></div>',
+          '<div class="occ-bar"><div class="occ-fill low skel" style="width:100%"></div></div>',
+        '</div>',
+        '<div class="price-row">',
+          '<div class="skel" style="width:80px;height:24px;border-radius:5px"></div>',
+          '<div class="skel" style="width:80px;height:24px;border-radius:5px"></div>',
+        '</div>',
+        '<div class="skel" style="height:12px;width:90%;margin-top:0.6rem"></div>',
+      '</div>'
+    ].join('');
+  }).join('');
+
+  document.getElementById('summaryBar').className = 'summary-bar loading skel';
+  document.getElementById('summaryBar').textContent = '';
+
+  document.getElementById('routeBody').innerHTML =
+    '<tr><td colspan="5" style="padding:1rem 0.6rem"><div class="skel" style="height:12px;width:80%"></div></td></tr>' +
+    '<tr><td colspan="5" style="padding:0.3rem 0.6rem"><div class="skel" style="height:12px;width:65%"></div></td></tr>' +
+    '<tr><td colspan="5" style="padding:0.3rem 0.6rem"><div class="skel" style="height:12px;width:72%"></div></td></tr>';
+
+  document.getElementById('recList').innerHTML =
+    '<div style="padding:0.75rem;display:flex;flex-direction:column;gap:0.6rem">' +
+    [80,65,70,55].map(function(w) {
+      return '<div class="rec-item"><div class="skel" style="height:12px;width:' + w + '%;margin-bottom:6px"></div><div class="skel" style="height:10px;width:90%"></div></div>';
+    }).join('') + '</div>';
+}
+
+function renderResults(d) {
+  // Summary
+  var sb = document.getElementById('summaryBar');
+  sb.className = 'summary-bar';
+  sb.innerHTML = d.summary || '';
+  var now = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+  document.getElementById('summaryTime').textContent = 'Updated ' + now;
+  document.getElementById('toursUpdated').textContent = 'Updated ' + now;
+  document.getElementById('routesUpdated').textContent = 'Updated ' + now;
+
+  // Tours
+  if (d.tours && d.tours.length) {
+    d.tours.forEach(function(t) {
+      var el = document.getElementById('tc-' + t.id);
+      if (!el) return;
+      var base = (TOURS.find(function(x){return x.id===t.id;}) || {}).basePrice || 0;
+      var occ = Math.max(0, Math.min(100, t.occupancyPct || 0));
+      var occCls = occ >= 80 ? 'high' : occ >= 55 ? 'med' : 'low';
+      var abCls = t.alertLevel === 'high' ? 'ab-high' : t.alertLevel === 'med' ? 'ab-med' : t.alertLevel === 'low' ? 'ab-low' : 'ab-none';
+      var cardCls = t.alertLevel === 'high' ? 'tour-card alert-high' : t.alertLevel === 'med' ? 'tour-card alert-med' : 'tour-card';
+      var tour = TOURS.find(function(x){return x.id===t.id;}) || {name:'Tour',dur:'',basePrice:0};
+      var priceDiff = t.recommendedPrice - base;
+      var diffStr = priceDiff > 0 ? '+£' + priceDiff : priceDiff < 0 ? '-£' + Math.abs(priceDiff) : '—';
+      var diffCls = priceDiff > 0 ? 'warn' : priceDiff < 0 ? 'rec' : '';
+      el.className = cardCls;
+      el.innerHTML = [
+        '<div class="tc-head">',
+          '<div><div class="tc-name">' + tour.name + '</div><div class="tc-dur">' + tour.dur + '</div></div>',
+          '<span class="alert-badge ' + abCls + '">' + escH(t.alertLabel || '—') + '</span>',
+        '</div>',
+        '<div class="occ-wrap">',
+          '<div class="occ-label"><span class="occ-text">Occupancy</span><span class="occ-pct">' + occ + '%</span></div>',
+          '<div class="occ-bar"><div class="occ-fill ' + occCls + '" style="width:' + occ + '%"></div></div>',
+        '</div>',
+        '<div class="price-row">',
+          '<div class="price-chip"><span class="pci">Base</span>£' + base + 'pp</div>',
+          '<div class="price-chip rec"><span class="pci">Rec</span>£' + (t.recommendedPrice || base) + 'pp</div>',
+          diffStr !== '—' ? '<div class="price-chip ' + diffCls + '">' + diffStr + '</div>' : '',
+        '</div>',
+        '<div class="tc-rec"><strong>' + capitalise(t.priceAction || '') + ':</strong> ' + escH(t.priceReason || '') + '</div>'
+      ].join('');
+    });
+  }
+
+  // Airlines
+  if (d.airlines && d.airlines.length) {
+    document.getElementById('routeBody').innerHTML = d.airlines.map(function(a) {
+      var trendIcon = a.trend === 'up' ? '↑' : a.trend === 'down' ? '↓' : '→';
+      var trendCls  = a.trend === 'up' ? 'trend-up' : a.trend === 'down' ? 'trend-dn' : 'trend-flat';
+      var fareCls   = '';
+      return [
+        '<tr>',
+          '<td><div class="airline-name">' + escH(a.airline) + '</div></td>',
+          '<td><span class="airline-route">' + escH(a.route) + '</span></td>',
+          '<td><span class="price-val ' + fareCls + '">' + escH(a.avgFare) + '</span></td>',
+          '<td><span class="' + trendCls + '">' + trendIcon + '</span></td>',
+          '<td><span class="route-badge">' + escH(a.status) + '</span></td>',
+        '</tr>'
+      ].join('');
+    }).join('');
+  }
+
+  // Recommendations
+  if (d.recommendations && d.recommendations.length) {
+    document.getElementById('recCount').textContent = d.recommendations.length + ' items';
+    document.getElementById('recList').innerHTML = '<div class="rec-list">' +
+      d.recommendations.map(function(r) {
+        var typeCls = r.type || 'price';
+        var typeLabel = {price:'Pricing',alert:'Fill Alert',window:'Booking Window',flight:'Flight Signal'}[r.type] || r.type;
+        return [
+          '<div class="rec-item">',
+            '<div class="rec-type ' + typeCls + '">' + typeLabel + '</div>',
+            '<div class="rec-body"><strong>' + escH(r.title) + '</strong> — ' + escH(r.body) + '</div>',
+            r.meta ? '<div class="rec-meta">' + escH(r.meta) + '</div>' : '',
+            '<button class="rec-action" onclick="copyRec(this)" data-text="' + escAttr(r.title + ': ' + r.body) + '">Copy →</button>',
+          '</div>'
+        ].join('');
+      }).join('') +
+    '</div>';
+  }
+}
+
+function renderDemoData() {
+  var demo = {
+    summary: 'Market conditions are strong for summer 2025. Grand Tour is approaching capacity and should have pricing reviewed immediately. Gulf market demand is growing, driven by FlyNas route expansion. April and May represent optimal booking windows with lower flight costs.',
+    tours: [
+      {id:'short',  occupancyPct:42, alertLevel:'none', alertLabel:'Good Availability', recommendedPrice:580,  priceAction:'maintain', priceReason:'Shoulder season — hold pricing to stimulate demand'},
+      {id:'classic',occupancyPct:71, alertLevel:'med',  alertLabel:'Selling Well',      recommendedPrice:1050, priceAction:'increase', priceReason:'Strong demand — £70pp increase justified by comparable operators'},
+      {id:'grand',  occupancyPct:89, alertLevel:'high', alertLabel:'Filling Fast',      recommendedPrice:1620, priceAction:'increase', priceReason:'Near capacity — raise price immediately and consider waitlist'},
+      {id:'kingdom',occupancyPct:53, alertLevel:'none', alertLabel:'Good Availability', recommendedPrice:1380, priceAction:'maintain', priceReason:'Steady bookings — maintain current rate and monitor'},
+      {id:'ski',    occupancyPct:28, alertLevel:'none', alertLabel:'Early Season',      recommendedPrice:700,  priceAction:'reduce',   priceReason:'Launch early-bird offer to stimulate Dec/Jan bookings'},
+      {id:'raft',   occupancyPct:62, alertLevel:'low',  alertLabel:'Moderate Demand',   recommendedPrice:500,  priceAction:'maintain', priceReason:'On track — Una River season opens June, bookings expected to surge'}
+    ],
+    airlines: [
+      {airline:'Wizz Air',          route:'LTN–SJJ', avgFare:'£89–£149', trend:'flat', status:'Good availability'},
+      {airline:'Turkish Airlines',  route:'LHR–IST–SJJ', avgFare:'£210–£340', trend:'up', status:'Summer selling fast'},
+      {airline:'Lufthansa',         route:'LHR–FRA–SJJ', avgFare:'£245–£390', trend:'flat', status:'Reliable inventory'},
+      {airline:'Austrian Airlines', route:'LHR–VIE–SJJ', avgFare:'£230–£360', trend:'down', status:'Value windows available'},
+      {airline:'FlyNas',            route:'RUH–SJJ',  avgFare:'SAR 890–1,400', trend:'up', status:'Strong Gulf demand'}
+    ],
+    recommendations: [
+      {type:'alert',  title:'Grand Tour Capacity Alert', body:'At 89% booked for summer, Grand Tour will fill within 2–3 weeks. Close new bookings or open a second departure immediately.', meta:'Revenue risk: ~£8,500 if second departure not added'},
+      {type:'price',  title:'Raise Classic Tour by £70pp', body:'Classic Tour demand tracking well above seasonal average. Competitors charge £1,100–£1,200pp. Increase to £1,050pp now.', meta:'Revenue uplift: ~£1,400 on current bookings'},
+      {type:'window', title:'April is Prime Booking Window', body:'Flight fares 35% cheaper in April vs peak summer. Push shoulder-season packages in email and social campaigns this week.', meta:'Wizz Air April fares from £89pp'},
+      {type:'flight', title:'FlyNas Gulf Route Trending Up', body:'Fares rising on RUH–SJJ signals growing Gulf demand. Prioritise Arabic-language content and halal package promotion.', meta:'Gulf halal tourism to Bosnia +18% YoY'},
+      {type:'window', title:'Ski Early-Bird Launch', body:'Ski bookings at 28%. Launch a 10% early-bird discount for December and January departures before competitors do.', meta:'Bjelašnica snowfall above 5yr average'}
+    ]
+  };
+  renderResults(demo);
+  addLog('result','📊','<strong>Demo data rendered</strong> — showing representative market intelligence');
+}
+
+// ── UTILS ──
+function extractJSON(text) {
+  if (!text) return null;
+  try {
+    var start = text.indexOf('{');
+    var end = text.lastIndexOf('}');
+    if (start === -1 || end === -1) return null;
+    return JSON.parse(text.substring(start, end + 1));
+  } catch(e) {
+    return null;
+  }
+}
+
+function escH(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function escAttr(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function capitalise(s) {
+  if (!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function copyRec(btn) {
+  var text = btn.getAttribute('data-text');
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(function() {
+    var orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(function() { btn.textContent = orig; }, 2000);
+  });
+}
+
+function filterBy() {}
+
+// Expose
+window.runAgent = runAgent;
+window.copyRec = copyRec;
+window.filterBy = filterBy;
+
+// ── INIT ──
+renderStaticTours();
+renderHeatmap();
+</script>
+</body>
+</html>

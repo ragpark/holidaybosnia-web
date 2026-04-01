@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holiday Bosnia — Inquiry Triage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sage:     #4a7c59;
+  --sage-lt:  #6a9c79;
+  --sage-dk:  #2e5238;
+  --copper:   #c07b45;
+  --copper-lt:#d49060;
+  --cream:    #faf7f2;
+  --warm:     #f3ede3;
+  --stone:    #e8e0d2;
+  --chalk:    #ffffff;
+  --ink:      #1c2b1f;
+  --body:     #3d4f40;
+  --muted:    #7a9080;
+  --sidebar:  #f7f4ef;
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'DM Sans', sans-serif;
+  --sh:       0 2px 12px rgba(44,80,56,0.08);
+  --sh-md:    0 6px 28px rgba(44,80,56,0.11);
+  --sh-lg:    0 16px 56px rgba(44,80,56,0.14);
+  /* Priority colours */
+  --p-high:   #c0392b;
+  --p-high-bg:#fdf2f1;
+  --p-med:    #c07b45;
+  --p-med-bg: #fdf5ee;
+  --p-low:    #4a7c59;
+  --p-low-bg: #f0f6f2;
+}
+
+html, body {
+  height: 100%; font-family: var(--sans);
+  background: var(--cream); color: var(--body);
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+
+/* ── SHELL ── */
+.shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 52px 1fr;
+  height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  grid-column: 1 / -1;
+  background: var(--sage-dk);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.tb-left { display: flex; align-items: center; gap: 1.2rem; }
+.tb-logo {
+  font-family: var(--serif); font-size: 1.05rem; font-weight: 400;
+  color: rgba(255,255,255,0.9); text-decoration: none; letter-spacing: 0.03em;
+}
+.tb-logo em { font-style: italic; color: rgba(212,160,86,0.8); font-weight: 300; }
+.tb-divider { width: 1px; height: 18px; background: rgba(255,255,255,0.15); }
+.tb-title { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.tb-right { display: flex; align-items: center; gap: 0.8rem; }
+.tb-badge {
+  font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.22rem 0.65rem; border-radius: 100px;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.tb-badge.live { background: rgba(74,124,89,0.25); color: rgba(160,220,160,0.85); border-color: rgba(74,124,89,0.3); }
+
+/* ── LEFT NAV ── */
+.leftnav {
+  background: var(--sidebar);
+  border-right: 1px solid var(--stone);
+  display: flex; flex-direction: column;
+  padding: 1.2rem 0;
+  overflow-y: auto;
+}
+.nav-section { margin-bottom: 1.5rem; }
+.nav-section-label {
+  font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); padding: 0 1rem; margin-bottom: 0.4rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.52rem 1rem; font-size: 0.82rem; color: var(--body);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+.nav-item:hover { background: var(--stone); color: var(--ink); }
+.nav-item.active { background: var(--warm); color: var(--sage-dk); border-left-color: var(--sage); font-weight: 500; }
+.nav-item .ni-icon { width: 16px; text-align: center; font-size: 0.85rem; flex-shrink: 0; }
+.nav-count {
+  margin-left: auto; font-size: 0.65rem; font-weight: 600;
+  background: var(--copper); color: #fff;
+  padding: 0.1rem 0.45rem; border-radius: 100px; min-width: 18px; text-align: center;
+}
+.nav-count.sage { background: var(--sage); }
+
+/* ── MAIN CONTENT ── */
+.main {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  overflow: hidden;
+}
+
+/* ── INBOX PANEL ── */
+.inbox-panel {
+  border-right: 1px solid var(--stone);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--chalk);
+}
+.panel-header {
+  padding: 1rem 1.2rem 0.8rem;
+  border-bottom: 1px solid var(--stone);
+  flex-shrink: 0;
+}
+.panel-header-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+.panel-title { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+.new-btn {
+  background: var(--sage); color: #fff; border: none;
+  border-radius: 6px; padding: 0.3rem 0.75rem;
+  font-family: var(--sans); font-size: 0.72rem; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.new-btn:hover { background: var(--sage-dk); }
+.search-wrap {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--cream); border: 1px solid var(--stone);
+  border-radius: 7px; padding: 0.42rem 0.75rem;
+}
+.search-wrap input {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: var(--sans); font-size: 0.8rem; color: var(--ink);
+}
+.search-wrap input::placeholder { color: var(--muted); }
+.search-icon { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; }
+
+/* Filter tabs */
+.filter-tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--stone);
+  flex-shrink: 0; background: var(--chalk);
+}
+.ftab {
+  flex: 1; padding: 0.55rem 0; font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
+  cursor: pointer; text-align: center; border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.ftab.active { color: var(--sage); border-bottom-color: var(--sage); }
+.ftab:hover { color: var(--body); }
+
+/* Inquiry list */
+.inquiry-list {
+  flex: 1; overflow-y: auto; padding: 0.5rem 0;
+}
+.inquiry-list::-webkit-scrollbar { width: 3px; }
+.inquiry-list::-webkit-scrollbar-thumb { background: var(--stone); }
+
+.inq-item {
+  padding: 0.85rem 1.1rem;
+  cursor: pointer; border-bottom: 1px solid rgba(232,224,210,0.5);
+  transition: background 0.12s;
+  position: relative;
+}
+.inq-item:hover { background: var(--cream); }
+.inq-item.active { background: var(--warm); }
+.inq-item.unread::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 60%; background: var(--sage); border-radius: 0 2px 2px 0;
+}
+
+.inq-row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.25rem; }
+.inq-name { font-size: 0.83rem; font-weight: 500; color: var(--ink); }
+.inq-item.unread .inq-name { font-weight: 600; }
+.inq-time { font-size: 0.7rem; color: var(--muted); flex-shrink: 0; }
+
+.inq-subject { font-size: 0.78rem; color: var(--body); margin-bottom: 0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inq-preview { font-size: 0.74rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.inq-tags { display: flex; gap: 0.35rem; margin-top: 0.45rem; flex-wrap: wrap; }
+.tag {
+  font-size: 0.62rem; letter-spacing: 0.06em; font-weight: 500;
+  padding: 0.15rem 0.55rem; border-radius: 100px;
+}
+.tag.priority-high  { background: var(--p-high-bg); color: var(--p-high); }
+.tag.priority-med   { background: var(--p-med-bg);  color: var(--p-med);  }
+.tag.priority-low   { background: var(--p-low-bg);  color: var(--p-low);  }
+.tag.type { background: rgba(74,124,89,0.08); color: var(--sage-dk); }
+.tag.new  { background: rgba(192,123,69,0.1); color: var(--copper); }
+
+/* ── TRIAGE PANEL ── */
+.triage-panel {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--cream);
+}
+
+/* Empty state */
+.empty-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0.8rem; color: var(--muted); text-align: center; padding: 3rem;
+}
+.empty-icon { font-size: 2.5rem; opacity: 0.4; }
+.empty-title { font-family: var(--serif); font-size: 1.3rem; font-weight: 300; color: var(--ink); }
+.empty-body { font-size: 0.83rem; line-height: 1.65; max-width: 280px; }
+
+/* Triage content */
+.triage-content {
+  flex: 1; overflow-y: auto; padding: 1.5rem;
+  display: flex; flex-direction: column; gap: 1.2rem;
+}
+.triage-content::-webkit-scrollbar { width: 3px; }
+.triage-content::-webkit-scrollbar-thumb { background: var(--stone); }
+
+/* Original message card */
+.msg-card {
+  background: var(--chalk); border: 1px solid var(--stone);
+  border-radius: 10px; overflow: hidden; box-shadow: var(--sh);
+}
+.msg-card-header {
+  padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--stone);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.msg-card-from { font-size: 0.83rem; font-weight: 500; color: var(--ink); }
+.msg-card-meta { font-size: 0.74rem; color: var(--muted); }
+.msg-card-body { padding: 1rem 1.1rem; font-size: 0.86rem; line-height: 1.75; color: var(--body); }
+
+/* Triage status bar */
+.triage-bar {
+  background: var(--chalk); border: 1px solid var(--stone);
+  border-radius: 10px; padding: 1rem 1.2rem;
+  box-shadow: var(--sh);
+}
+.triage-bar-label {
+  font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.75rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.triage-running {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.72rem; color: var(--sage);
+}
+.mini-spinner {
+  width: 12px; height: 12px;
+  border: 1.5px solid var(--stone); border-top-color: var(--sage);
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.triage-fields {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;
+}
+.tfield {
+  background: var(--cream); border-radius: 7px; padding: 0.7rem 0.85rem;
+  border: 1px solid var(--stone);
+}
+.tfield-label {
+  font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.3rem;
+}
+.tfield-value {
+  font-size: 0.83rem; font-weight: 500; color: var(--ink); line-height: 1.3;
+}
+.tfield-value.empty { color: var(--muted); font-weight: 400; font-style: italic; }
+.tfield-value.high { color: var(--p-high); }
+.tfield-value.med  { color: var(--p-med); }
+.tfield-value.low  { color: var(--p-low); }
+
+/* AI summary */
+.summary-card {
+  background: var(--chalk); border: 1px solid var(--stone);
+  border-radius: 10px; overflow: hidden; box-shadow: var(--sh);
+}
+.summary-header {
+  padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--stone);
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.summary-icon {
+  width: 26px; height: 26px; background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dk) 100%);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; color: #fff; flex-shrink: 0;
+}
+.summary-title { font-size: 0.82rem; font-weight: 600; color: var(--ink); }
+.summary-sub { font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+.summary-body { padding: 1rem 1.1rem; font-size: 0.85rem; line-height: 1.75; color: var(--body); }
+.summary-body p { margin-bottom: 0.6rem; }
+.summary-body p:last-child { margin-bottom: 0; }
+.summary-body strong { color: var(--ink); font-weight: 500; }
+
+/* Recommended actions */
+.actions-card {
+  background: var(--chalk); border: 1px solid var(--stone);
+  border-radius: 10px; overflow: hidden; box-shadow: var(--sh);
+}
+.actions-header {
+  padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--stone);
+  font-size: 0.82rem; font-weight: 600; color: var(--ink);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.action-list { padding: 0.6rem 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.action-item {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  padding: 0.6rem 0.7rem; border-radius: 7px;
+  font-size: 0.82rem; color: var(--body); line-height: 1.4;
+  background: var(--cream); border: 1px solid var(--stone);
+}
+.action-item .ai { flex-shrink: 0; margin-top: 1px; font-size: 0.9rem; }
+
+/* Draft reply */
+.draft-card {
+  background: var(--chalk); border: 1px solid var(--stone);
+  border-radius: 10px; overflow: hidden; box-shadow: var(--sh);
+}
+.draft-header {
+  padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--stone);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.draft-title { font-size: 0.82rem; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 0.5rem; }
+.draft-controls { display: flex; gap: 0.5rem; align-items: center; }
+.draft-btn {
+  background: none; border: 1px solid var(--stone); border-radius: 6px;
+  padding: 0.28rem 0.7rem; font-family: var(--sans); font-size: 0.71rem;
+  color: var(--body); cursor: pointer; transition: all 0.15s;
+}
+.draft-btn:hover { border-color: var(--sage); color: var(--sage); }
+.draft-btn.primary { background: var(--sage); color: #fff; border-color: var(--sage); }
+.draft-btn.primary:hover { background: var(--sage-dk); }
+.draft-btn.copper { background: var(--copper); color: #fff; border-color: var(--copper); }
+.draft-btn.copper:hover { background: var(--copper-lt); }
+.draft-textarea {
+  width: 100%; padding: 1rem 1.1rem; min-height: 220px;
+  background: none; border: none; outline: none; resize: vertical;
+  font-family: var(--sans); font-size: 0.85rem; line-height: 1.75;
+  color: var(--body);
+}
+
+/* New inquiry input area */
+.new-inquiry-area {
+  background: var(--chalk); border-top: 1px solid var(--stone);
+  padding: 1rem 1.5rem; flex-shrink: 0;
+  display: none;
+}
+.new-inquiry-area.visible { display: block; }
+.ni-label { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+.ni-textarea {
+  width: 100%; padding: 0.8rem 1rem; background: var(--cream);
+  border: 1.5px solid var(--stone); border-radius: 8px;
+  font-family: var(--sans); font-size: 0.85rem; color: var(--ink);
+  resize: none; outline: none; line-height: 1.65;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.ni-textarea:focus { border-color: var(--sage-lt); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
+.ni-meta {
+  display: flex; gap: 0.6rem; margin-top: 0.6rem; flex-wrap: wrap;
+}
+.ni-meta input {
+  flex: 1; min-width: 140px; padding: 0.5rem 0.8rem;
+  background: var(--cream); border: 1.5px solid var(--stone);
+  border-radius: 7px; font-family: var(--sans); font-size: 0.82rem;
+  color: var(--ink); outline: none;
+  transition: border-color 0.18s;
+}
+.ni-meta input:focus { border-color: var(--sage-lt); }
+.ni-meta input::placeholder { color: var(--muted); }
+.ni-actions { display: flex; gap: 0.5rem; margin-top: 0.7rem; justify-content: flex-end; }
+.ni-cancel { background: none; border: 1px solid var(--stone); border-radius: 6px; padding: 0.45rem 1rem; font-family: var(--sans); font-size: 0.78rem; color: var(--muted); cursor: pointer; }
+.ni-cancel:hover { border-color: var(--muted); color: var(--body); }
+.ni-submit { background: var(--sage); color: #fff; border: none; border-radius: 6px; padding: 0.45rem 1.2rem; font-family: var(--sans); font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+.ni-submit:hover:not(:disabled) { background: var(--sage-dk); }
+.ni-submit:disabled { background: var(--stone); color: var(--muted); cursor: not-allowed; }
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--stone) 25%, var(--cream) 50%, var(--stone) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* Pulse dot */
+.pulse-dot {
+  width: 7px; height: 7px; background: var(--sage-lt);
+  border-radius: 50%; display: inline-block;
+  animation: pdot 2.2s ease-in-out infinite;
+}
+@keyframes pdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+  background: var(--ink); color: rgba(255,255,255,0.9);
+  padding: 0.7rem 1.1rem; border-radius: 8px;
+  font-size: 0.82rem; box-shadow: var(--sh-lg);
+  transform: translateY(100px); opacity: 0;
+  transition: transform 0.25s, opacity 0.25s;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Fade in animation */
+.fadein { animation: fi 0.3s ease; }
+@keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--stone); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="tb-left">
+      <a href="#" class="tb-logo">Holiday <em>Bosnia</em></a>
+      <div class="tb-divider"></div>
+      <span class="tb-title">Inquiry Triage</span>
+    </div>
+    <div class="tb-right">
+      <span class="tb-badge live"><span class="pulse-dot" style="width:5px;height:5px;margin-right:4px;vertical-align:middle"></span>AI Active</span>
+      <span class="tb-badge">Internal Tool</span>
+    </div>
+  </header>
+
+  <!-- LEFT NAV -->
+  <nav class="leftnav">
+    <div class="nav-section">
+      <div class="nav-section-label">Inbox</div>
+      <a class="nav-item active"><span class="ni-icon">📥</span>All inquiries<span class="nav-count" id="allCount">4</span></a>
+      <a class="nav-item" onclick="filterBy('new')"><span class="ni-icon">🔔</span>New<span class="nav-count" id="newCount">2</span></a>
+      <a class="nav-item" onclick="filterBy('high')"><span class="ni-icon">🔴</span>High priority<span class="nav-count" id="highCount">1</span></a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Trip type</div>
+      <a class="nav-item" onclick="filterBy('cultural')"><span class="ni-icon">🕌</span>Cultural</a>
+      <a class="nav-item" onclick="filterBy('adventure')"><span class="ni-icon">🏔</span>Adventure</a>
+      <a class="nav-item" onclick="filterBy('family')"><span class="ni-icon">👨‍👩‍👧</span>Family</a>
+      <a class="nav-item" onclick="filterBy('halal')"><span class="ni-icon">✦</span>Halal focus</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Status</div>
+      <a class="nav-item" onclick="filterBy('replied')"><span class="ni-icon">✅</span>Replied</a>
+      <a class="nav-item" onclick="filterBy('pending')"><span class="ni-icon">⏳</span>Pending<span class="nav-count sage">3</span></a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- INBOX LIST -->
+    <div class="inbox-panel">
+      <div class="panel-header">
+        <div class="panel-header-top">
+          <div class="panel-title">Inquiries</div>
+          <button class="new-btn" onclick="showNewInquiry()">+ New</button>
+        </div>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search inquiries…" oninput="filterSearch(this.value)">
+        </div>
+      </div>
+      <div class="filter-tabs">
+        <div class="ftab active" onclick="setFtab(this,'all')">All</div>
+        <div class="ftab" onclick="setFtab(this,'unread')">Unread</div>
+        <div class="ftab" onclick="setFtab(this,'pending')">Pending</div>
+        <div class="ftab" onclick="setFtab(this,'today')">Today</div>
+      </div>
+      <div class="inquiry-list" id="inquiryList"></div>
+    </div>
+
+    <!-- TRIAGE PANEL -->
+    <div class="triage-panel" id="triagePanel">
+
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🗂</div>
+        <div class="empty-title">Select an inquiry</div>
+        <div class="empty-body">Choose an inquiry from the list to triage it, or paste a new one using the "+ New" button.</div>
+      </div>
+
+      <div class="triage-content" id="triageContent" style="display:none"></div>
+
+      <div class="new-inquiry-area" id="newInquiryArea">
+        <div class="ni-label">Paste inquiry — email, WhatsApp, contact form, or any message</div>
+        <textarea class="ni-textarea" id="niText" rows="5" placeholder="e.g. Hi, I'm interested in a family trip to Bosnia for 2 adults and 3 children aged 5–12. We need halal food and are thinking mid-July for about 10 days. Budget is flexible. Can you help?"></textarea>
+        <div class="ni-meta">
+          <input type="text" id="niFrom" placeholder="Sender name (optional)">
+          <input type="email" id="niEmail" placeholder="Email address (optional)">
+          <input type="text" id="niSource" placeholder="Source: email / WhatsApp / form">
+        </div>
+        <div class="ni-actions">
+          <button class="ni-cancel" onclick="hideNewInquiry()">Cancel</button>
+          <button class="ni-submit" id="niSubmit" onclick="triageNewInquiry()">Triage with AI ✦</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SAMPLE DATA ──
+const SAMPLE_INQUIRIES = [
+  {
+    id: 1,
+    name: 'Fatima Al-Rashid',
+    email: 'fatima.alrashid@gmail.com',
+    source: 'Contact form',
+    time: '09:14',
+    date: 'Today',
+    subject: 'Family trip — 10 days, halal requirements',
+    preview: 'Hi, we are a family of 5 looking for a 10-day trip...',
+    body: `Hi there,
+
+My name is Fatima and I'm planning a family holiday to Bosnia-Herzegovina with my husband and three children (ages 6, 9 and 13). We are Muslim so halal food is essential for us.
+
+We are thinking of 10 days, ideally in late July or August this year. Budget is moderate — we don't need luxury but we want comfortable accommodation.
+
+We love history and culture, and the children enjoy outdoor activities. We've heard Mostar and Sarajevo are wonderful. Could you suggest an itinerary and let us know approximate costs?
+
+Looking forward to hearing from you!
+Fatima`,
+    unread: true,
+    triage: null
+  },
+  {
+    id: 2,
+    name: 'James Whitmore',
+    email: 'j.whitmore@outlook.com',
+    source: 'Email',
+    time: '07:52',
+    date: 'Today',
+    subject: 'Quick question re skiing — Feb half term',
+    preview: 'Morning! We\'re considering Bosnia for a ski trip...',
+    body: `Morning!
+
+We're a group of 4 adults (2 couples) considering Bosnia for a ski trip over February half term (22–28 Feb). We're intermediate skiers and have been to Austria and Bulgaria before.
+
+A few questions:
+- How does Bjelašnica compare to other European resorts?
+- What's the après-ski like?
+- Do you offer a package that includes flights and accommodation?
+- Rough cost per person?
+
+Thanks
+James`,
+    unread: true,
+    triage: null
+  },
+  {
+    id: 3,
+    name: 'Dr. Amara Osei',
+    email: 'a.osei@nhs.net',
+    source: 'WhatsApp',
+    time: 'Yesterday',
+    date: 'Yesterday',
+    subject: 'Solo trip — history & walking, 7 days',
+    preview: 'Hello, I\'m a solo female traveller interested in...',
+    body: `Hello,
+
+I'm a solo female traveller (40s) interested in a 7-day history and walking trip to Bosnia. I've travelled extensively in Turkey and Jordan so I'm familiar with Muslim-majority countries.
+
+I'm particularly interested in:
+- Sarajevo siege history and the War Tunnel
+- Ottoman heritage sites
+- Day hikes — nothing too strenuous but I do enjoy walking
+- Good local restaurants (halal preferred but not essential)
+
+Is Bosnia safe for solo female travellers? What time of year would you recommend? I'm flexible on dates — probably September or October.
+
+Thanks so much,
+Amara`,
+    unread: false,
+    triage: null
+  },
+  {
+    id: 4,
+    name: 'Luka Petrović',
+    email: 'luka.petrovic@protonmail.com',
+    source: 'Contact form',
+    time: 'Mon',
+    date: 'Monday',
+    subject: 'Group rafting + Sutjeska hiking — 6 people',
+    preview: 'Hey, me and 5 mates are planning an adventure trip...',
+    body: `Hey,
+
+Me and 5 mates are planning an adventure trip to Bosnia — we want to do whitewater rafting on the Una River and possibly some hiking in Sutjeska National Park.
+
+We're all in our late 20s and early 30s, pretty fit and looking for something challenging. We'd want about 6–8 days, budget is around £600–800 per person all in.
+
+Can you do a bespoke package for us? When's the best time for the Una? We're thinking June.
+
+Cheers,
+Luka`,
+    unread: false,
+    triage: null
+  }
+];
+
+let inquiries = JSON.parse(JSON.stringify(SAMPLE_INQUIRIES));
+let selectedId = null;
+let currentFilter = 'all';
+
+// ── RENDER INBOX ──
+function renderInbox(items) {
+  const list = document.getElementById('inquiryList');
+  if (!items.length) {
+    list.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem">No inquiries found</div>';
+    return;
+  }
+  list.innerHTML = items.map(inq => {
+    const tags = buildTags(inq);
+    return `
+    <div class="inq-item ${inq.unread ? 'unread' : ''} ${inq.id === selectedId ? 'active' : ''}" onclick="selectInquiry(${inq.id})">
+      <div class="inq-row1">
+        <div class="inq-name">${esc(inq.name)}</div>
+        <div class="inq-time">${esc(inq.time)}</div>
+      </div>
+      <div class="inq-subject">${esc(inq.subject)}</div>
+      <div class="inq-preview">${esc(inq.preview)}</div>
+      <div class="inq-tags">${tags}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildTags(inq) {
+  let tags = '';
+  if (inq.unread) tags += '<span class="tag new">New</span>';
+  if (inq.triage) {
+    const p = inq.triage.priority?.toLowerCase();
+    const cls = p === 'high' ? 'priority-high' : p === 'medium' ? 'priority-med' : 'priority-low';
+    tags += `<span class="tag ${cls}">${inq.triage.priority || 'Low'}</span>`;
+    if (inq.triage.tripType) tags += `<span class="tag type">${inq.triage.tripType}</span>`;
+  }
+  return tags;
+}
+
+// ── SELECT INQUIRY ──
+function selectInquiry(id) {
+  selectedId = id;
+  const inq = inquiries.find(i => i.id === id);
+  if (!inq) return;
+  inq.unread = false;
+  renderInbox(inquiries);
+  hideNewInquiry();
+  updateCounts();
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('triageContent').style.display = 'flex';
+
+  if (inq.triage) {
+    renderTriage(inq);
+  } else {
+    renderTriagePending(inq);
+    runTriage(inq);
+  }
+}
+
+// ── RENDER TRIAGE (loading skeleton) ──
+function renderTriagePending(inq) {
+  const c = document.getElementById('triageContent');
+  c.className = 'triage-content fadein';
+  c.innerHTML = `
+    <div class="msg-card">
+      <div class="msg-card-header">
+        <div>
+          <div class="msg-card-from">${esc(inq.name)}</div>
+          <div class="msg-card-meta">${esc(inq.source)} · ${esc(inq.date)} at ${esc(inq.time)} · ${esc(inq.email)}</div>
+        </div>
+        <div class="inq-tags"><span class="tag new">New</span></div>
+      </div>
+      <div class="msg-card-body" style="white-space:pre-wrap">${esc(inq.body)}</div>
+    </div>
+
+    <div class="triage-bar">
+      <div class="triage-bar-label">
+        <span>AI Classification</span>
+        <span class="triage-running"><div class="mini-spinner"></div>Analysing…</span>
+      </div>
+      <div class="triage-fields" id="triageFields">
+        ${skeletonFields()}
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-header">
+        <div class="summary-icon">✦</div>
+        <div class="summary-title">AI Summary</div>
+        <div class="summary-sub">Generating…</div>
+      </div>
+      <div class="summary-body" id="summaryBody">
+        <div class="skeleton" style="height:12px;width:90%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:12px;width:75%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:12px;width:85%"></div>
+      </div>
+    </div>
+
+    <div class="actions-card">
+      <div class="actions-header">⚡ Recommended Actions</div>
+      <div class="action-list" id="actionList">
+        <div class="skeleton" style="height:40px;border-radius:7px;margin:0.3rem 0.8rem"></div>
+        <div class="skeleton" style="height:40px;border-radius:7px;margin:0.3rem 0.8rem"></div>
+      </div>
+    </div>
+
+    <div class="draft-card">
+      <div class="draft-header">
+        <div class="draft-title">✉ Draft Reply</div>
+        <div class="draft-controls">
+          <div class="skeleton" style="height:26px;width:60px;border-radius:6px"></div>
+          <div class="skeleton" style="height:26px;width:80px;border-radius:6px"></div>
+        </div>
+      </div>
+      <div style="padding:1rem 1.1rem">
+        <div class="skeleton" style="height:12px;width:80%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:12px;width:95%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:12px;width:70%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:12px;width:88%"></div>
+      </div>
+    </div>
+  `;
+}
+
+function skeletonFields() {
+  return ['Priority','Trip Type','Duration','Group Size','Budget','Dates','Halal Req.','Source','Urgency'].map(l =>
+    `<div class="tfield"><div class="tfield-label">${l}</div><div class="skeleton" style="height:14px;width:70%;margin-top:2px"></div></div>`
+  ).join('');
+}
+
+// ── RUN AI TRIAGE ──
+async function runTriage(inq) {
+  const prompt = `You are the inquiry triage system for Holiday Bosnia, an ethical Sarajevo-based travel company.
+
+Analyse this customer inquiry and respond with ONLY a valid JSON object — no markdown, no explanation, just raw JSON.
+
+INQUIRY FROM: ${inq.name} (${inq.email})
+SOURCE: ${inq.source}
+MESSAGE:
+${inq.body}
+
+Respond with this exact structure:
+{
+  "priority": "High|Medium|Low",
+  "priorityReason": "one sentence explaining why",
+  "tripType": "Cultural|Adventure|Family|Skiing|Rafting|Hiking|Solo|Mixed",
+  "duration": "e.g. 10 days",
+  "groupSize": "e.g. Family of 5",
+  "budget": "e.g. Moderate / £600–800pp / Unknown",
+  "dates": "e.g. Late July or August / February half term / Flexible",
+  "halalRequired": true|false,
+  "language": "English",
+  "urgency": "Book soon|Planning ahead|Exploratory",
+  "summary": "2–3 sentence warm summary of what this traveller wants and needs. Written as a briefing for the sales team.",
+  "recommendedPackage": "Name the most suitable Holiday Bosnia package",
+  "actions": ["action 1", "action 2", "action 3"],
+  "draftReply": "A complete, warm, personalised email reply from the Holiday Bosnia team. Use the traveller's first name. Address their specific questions. Mention relevant tours, destinations and practical details. End with next steps. Sign off as The Holiday Bosnia Team. Plain text, no markdown."
+}
+
+Priority rules: High = ready to book, specific dates, group confirmed. Medium = serious interest, some details confirmed. Low = early research, no dates, vague.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '{}';
+
+    let parsed;
+    try {
+      const clean = raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      parsed = { priority: 'Medium', summary: raw.substring(0,300), draftReply: '', actions: [] };
+    }
+
+    inq.triage = parsed;
+    renderTriage(inq);
+    updateCounts();
+    renderInbox(inquiries);
+
+  } catch(err) {
+    console.error(err);
+    document.getElementById('triageContent').innerHTML += `<div style="padding:1rem;color:var(--p-high);font-size:0.82rem">Error running triage. Please try again.</div>`;
+  }
+}
+
+// ── RENDER FULL TRIAGE ──
+function renderTriage(inq) {
+  const t = inq.triage;
+  const c = document.getElementById('triageContent');
+  c.className = 'triage-content fadein';
+
+  const priCls = (t.priority||'').toLowerCase() === 'high' ? 'high' : (t.priority||'').toLowerCase() === 'medium' ? 'med' : 'low';
+
+  const fields = [
+    { label: 'Priority',    value: t.priority,          cls: priCls },
+    { label: 'Trip Type',   value: t.tripType,           cls: '' },
+    { label: 'Duration',    value: t.duration,           cls: '' },
+    { label: 'Group Size',  value: t.groupSize,          cls: '' },
+    { label: 'Budget',      value: t.budget,             cls: '' },
+    { label: 'Dates',       value: t.dates,              cls: '' },
+    { label: 'Halal Req.',  value: t.halalRequired ? 'Yes ✓' : 'No', cls: t.halalRequired ? 'low' : '' },
+    { label: 'Urgency',     value: t.urgency,            cls: '' },
+    { label: 'Recommended', value: t.recommendedPackage, cls: '' },
+  ].map(f => `
+    <div class="tfield">
+      <div class="tfield-label">${esc(f.label)}</div>
+      <div class="tfield-value ${f.cls||''}">${esc(f.value||'—')}</div>
+    </div>
+  `).join('');
+
+  const actions = (t.actions||[]).map(a =>
+    `<div class="action-item"><span class="ai">→</span>${esc(a)}</div>`
+  ).join('');
+
+  c.innerHTML = `
+    <div class="msg-card fadein">
+      <div class="msg-card-header">
+        <div>
+          <div class="msg-card-from">${esc(inq.name)}</div>
+          <div class="msg-card-meta">${esc(inq.source)} · ${esc(inq.date)} at ${esc(inq.time)} · ${esc(inq.email)}</div>
+        </div>
+        <div class="inq-tags">
+          <span class="tag priority-${priCls === 'high' ? 'high' : priCls === 'med' ? 'med' : 'low'}">${esc(t.priority||'Low')}</span>
+          ${t.tripType ? `<span class="tag type">${esc(t.tripType)}</span>` : ''}
+        </div>
+      </div>
+      <div class="msg-card-body" style="white-space:pre-wrap">${esc(inq.body)}</div>
+    </div>
+
+    <div class="triage-bar fadein">
+      <div class="triage-bar-label">
+        <span>AI Classification</span>
+        <span style="font-size:0.7rem;color:var(--sage)">✓ Complete</span>
+      </div>
+      <div class="triage-fields">${fields}</div>
+      ${t.priorityReason ? `<div style="margin-top:0.7rem;font-size:0.78rem;color:var(--muted);padding:0.6rem 0.8rem;background:var(--cream);border-radius:6px;border:1px solid var(--stone)">💡 ${esc(t.priorityReason)}</div>` : ''}
+    </div>
+
+    <div class="summary-card fadein">
+      <div class="summary-header">
+        <div class="summary-icon">✦</div>
+        <div class="summary-title">AI Summary</div>
+        <div class="summary-sub">For your team</div>
+      </div>
+      <div class="summary-body"><p>${esc(t.summary||'—')}</p></div>
+    </div>
+
+    ${actions ? `
+    <div class="actions-card fadein">
+      <div class="actions-header">⚡ Recommended Actions</div>
+      <div class="action-list">${actions}</div>
+    </div>` : ''}
+
+    <div class="draft-card fadein">
+      <div class="draft-header">
+        <div class="draft-title">✉ Draft Reply <span style="font-size:0.7rem;font-weight:400;color:var(--muted)">— editable</span></div>
+        <div class="draft-controls">
+          <button class="draft-btn" onclick="regenerateDraft(${inq.id})">↺ Regenerate</button>
+          <button class="draft-btn" onclick="copyDraft()">📋 Copy</button>
+          <button class="draft-btn copper" onclick="openMailto(${inq.id})">✉ Open in Mail</button>
+        </div>
+      </div>
+      <textarea class="draft-textarea" id="draftTextarea">${esc(t.draftReply||'')}</textarea>
+    </div>
+  `;
+}
+
+// ── ACTIONS ──
+function copyDraft() {
+  const ta = document.getElementById('draftTextarea');
+  if (!ta) return;
+  navigator.clipboard.writeText(ta.value).then(() => showToast('Reply copied to clipboard'));
+}
+
+function openMailto(id) {
+  const inq = inquiries.find(i => i.id === id);
+  const ta = document.getElementById('draftTextarea');
+  if (!inq || !ta) return;
+  const subject = encodeURIComponent('Re: ' + inq.subject);
+  const body = encodeURIComponent(ta.value);
+  window.location.href = `mailto:${inq.email}?subject=${subject}&body=${body}`;
+  showToast('Opening email client…');
+}
+
+async function regenerateDraft(id) {
+  const inq = inquiries.find(i => i.id === id);
+  if (!inq || !inq.triage) return;
+  const ta = document.getElementById('draftTextarea');
+  if (ta) { ta.disabled = true; ta.style.opacity = '0.5'; }
+
+  showToast('Regenerating draft…');
+
+  const prompt = `Write a fresh, warm, personalised email reply for this travel inquiry.
+
+FROM: ${inq.name} (${inq.email})
+INQUIRY:
+${inq.body}
+
+TRIAGE NOTES: ${inq.triage.summary}
+RECOMMENDED PACKAGE: ${inq.triage.recommendedPackage}
+
+Write a complete reply. Use their first name. Address all their questions specifically. Mention relevant Holiday Bosnia tours and destinations. Include practical info relevant to their trip. End with clear next steps. Sign off as The Holiday Bosnia Team. Plain text only.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.find(b => b.type === 'text')?.text || '';
+    if (ta) { ta.value = reply; ta.disabled = false; ta.style.opacity = '1'; }
+    inq.triage.draftReply = reply;
+    showToast('Draft regenerated ✓');
+  } catch(e) {
+    if (ta) { ta.disabled = false; ta.style.opacity = '1'; }
+    showToast('Error regenerating — please try again');
+  }
+}
+
+// ── NEW INQUIRY ──
+function showNewInquiry() {
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('triageContent').style.display = 'none';
+  document.getElementById('newInquiryArea').classList.add('visible');
+  document.getElementById('niText').focus();
+  selectedId = null;
+  renderInbox(inquiries);
+}
+
+function hideNewInquiry() {
+  document.getElementById('newInquiryArea').classList.remove('visible');
+  if (!selectedId) {
+    document.getElementById('emptyState').style.display = 'flex';
+    document.getElementById('triageContent').style.display = 'none';
+  }
+}
+
+async function triageNewInquiry() {
+  const text = document.getElementById('niText').value.trim();
+  if (!text) { document.getElementById('niText').focus(); return; }
+
+  const name    = document.getElementById('niFrom').value.trim() || 'Unknown sender';
+  const email   = document.getElementById('niEmail').value.trim() || '';
+  const source  = document.getElementById('niSource').value.trim() || 'Manual entry';
+
+  const newInq = {
+    id: Date.now(),
+    name, email, source,
+    time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+    date: 'Today',
+    subject: text.substring(0, 60) + (text.length > 60 ? '…' : ''),
+    preview: text.substring(0, 80) + '…',
+    body: text,
+    unread: true,
+    triage: null
+  };
+
+  inquiries.unshift(newInq);
+  hideNewInquiry();
+  document.getElementById('niText').value = '';
+  document.getElementById('niFrom').value = '';
+  document.getElementById('niEmail').value = '';
+  document.getElementById('niSource').value = '';
+
+  updateCounts();
+  renderInbox(inquiries);
+  selectInquiry(newInq.id);
+}
+
+// ── UTILITIES ──
+function filterBy(type) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.target.closest('.nav-item').classList.add('active');
+}
+
+function filterSearch(q) {
+  if (!q) { renderInbox(inquiries); return; }
+  const lq = q.toLowerCase();
+  renderInbox(inquiries.filter(i =>
+    i.name.toLowerCase().includes(lq) ||
+    i.subject.toLowerCase().includes(lq) ||
+    i.body.toLowerCase().includes(lq)
+  ));
+}
+
+function setFtab(el, type) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (type === 'unread') renderInbox(inquiries.filter(i => i.unread));
+  else if (type === 'pending') renderInbox(inquiries.filter(i => !i.triage));
+  else renderInbox(inquiries);
+}
+
+function updateCounts() {
+  document.getElementById('allCount').textContent = inquiries.length;
+  document.getElementById('newCount').textContent = inquiries.filter(i => i.unread).length;
+  document.getElementById('highCount').textContent = inquiries.filter(i => i.triage?.priority === 'High').length;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Expose for inline handlers
+window.selectInquiry = selectInquiry;
+window.showNewInquiry = showNewInquiry;
+window.hideNewInquiry = hideNewInquiry;
+window.triageNewInquiry = triageNewInquiry;
+window.copyDraft = copyDraft;
+window.openMailto = openMailto;
+window.regenerateDraft = regenerateDraft;
+window.filterBy = filterBy;
+window.filterSearch = filterSearch;
+window.setFtab = setFtab;
+
+// ── INIT ──
+renderInbox(inquiries);
+updateCounts();
+</script>
+</body>
+</html>

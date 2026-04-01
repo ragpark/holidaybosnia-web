@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holiday Bosnia — Trip Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sage:     #4a7c59;
+  --sage-lt:  #6a9c79;
+  --sage-dk:  #2e5238;
+  --copper:   #c07b45;
+  --copper-lt:#d49060;
+  --cream:    #faf7f2;
+  --warm:     #f3ede3;
+  --stone:    #e8e0d2;
+  --chalk:    #ffffff;
+  --ink:      #1c2b1f;
+  --body:     #3d4f40;
+  --muted:    #7a9080;
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'DM Sans', sans-serif;
+  --r:        10px;
+  --sh:       0 4px 24px rgba(44,80,56,0.09);
+  --sh-lg:    0 12px 48px rgba(44,80,56,0.14);
+}
+
+html, body { height: 100%; font-family: var(--sans); background: var(--cream); color: var(--body); -webkit-font-smoothing: antialiased; overflow: hidden; }
+
+/* ── LAYOUT ── */
+.app {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--sage-dk);
+  display: flex; flex-direction: column;
+  overflow: hidden; position: relative;
+}
+.sidebar-mountains {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 45%;
+  pointer-events: none;
+}
+.sidebar-mountains::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(20,45,28,0.7) 100%);
+  clip-path: polygon(0%100%,0%65%,8%42%,16%58%,24%28%,33%50%,42%14%,51%42%,60%22%,68%48%,76%10%,84%35%,92%20%,100%38%,100%100%);
+}
+.sidebar-mountains::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 70%;
+  background: linear-gradient(180deg, rgba(40,75,50,0.4) 0%, rgba(20,45,28,0.65) 100%);
+  clip-path: polygon(0%100%,0%75%,7%60%,15%70%,23%48%,32%64%,40%38%,49%58%,57%42%,66%60%,74%36%,82%55%,90%44%,100%50%,100%100%);
+}
+
+.sidebar-top {
+  padding: 2rem 1.8rem 1.5rem;
+  position: relative; z-index: 2;
+  flex-shrink: 0;
+}
+.logo {
+  font-family: var(--serif); font-size: 1.25rem; font-weight: 400;
+  color: rgba(255,255,255,0.9); letter-spacing: 0.04em; margin-bottom: 1.8rem;
+  text-decoration: none; display: block;
+}
+.logo em { font-style: italic; color: rgba(212,160,86,0.85); font-weight: 300; }
+
+.sidebar-heading {
+  font-family: var(--serif);
+  font-size: 1.75rem; font-weight: 300; line-height: 1.15;
+  color: #fff; margin-bottom: 0.6rem;
+}
+.sidebar-heading em { font-style: italic; color: rgba(255,255,255,0.65); }
+.sidebar-sub {
+  font-size: 0.82rem; font-weight: 300;
+  color: rgba(255,255,255,0.5); line-height: 1.65; margin-bottom: 1.8rem;
+}
+
+/* Quick prompts */
+.quick-label {
+  font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.32); margin-bottom: 0.7rem;
+}
+.quick-prompts { display: flex; flex-direction: column; gap: 0.5rem; }
+.qp {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 0.7rem 0.9rem;
+  color: rgba(255,255,255,0.72); font-size: 0.81rem; line-height: 1.4;
+  cursor: pointer; text-align: left;
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  font-family: var(--sans);
+}
+.qp:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateX(3px);
+}
+.qp-icon { margin-right: 0.45rem; font-size: 0.9rem; }
+
+.sidebar-footer {
+  margin-top: auto; padding: 1.2rem 1.8rem;
+  position: relative; z-index: 2; flex-shrink: 0;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.sbadge {
+  font-size: 0.62rem; letter-spacing: 0.09em; text-transform: uppercase;
+  padding: 0.24rem 0.65rem;
+  border: 1px solid rgba(255,255,255,0.16); color: rgba(255,255,255,0.38);
+  border-radius: 100px;
+}
+
+/* ── CHAT AREA ── */
+.chat-area {
+  display: flex; flex-direction: column;
+  background: var(--chalk); overflow: hidden;
+}
+
+/* Top bar */
+.chat-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.8rem;
+  background: #fff;
+  border-bottom: 1px solid var(--stone);
+  flex-shrink: 0;
+}
+.topbar-title { font-size: 0.8rem; font-weight: 500; color: var(--ink); letter-spacing: 0.04em; }
+.topbar-sub { font-size: 0.73rem; color: var(--muted); }
+.topbar-status {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.72rem; color: var(--sage);
+}
+.status-dot {
+  width: 7px; height: 7px; background: var(--sage-lt);
+  border-radius: 50%;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
+
+/* Messages */
+.messages {
+  flex: 1; overflow-y: auto; padding: 1.8rem;
+  display: flex; flex-direction: column; gap: 1.2rem;
+  scroll-behavior: smooth;
+}
+.messages::-webkit-scrollbar { width: 4px; }
+.messages::-webkit-scrollbar-track { background: transparent; }
+.messages::-webkit-scrollbar-thumb { background: var(--stone); border-radius: 2px; }
+
+/* Welcome state */
+.welcome {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex: 1; padding: 3rem 2rem; text-align: center;
+}
+.welcome-icon {
+  font-size: 2.8rem; margin-bottom: 1.2rem;
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.welcome-title {
+  font-family: var(--serif); font-size: 2rem; font-weight: 300;
+  color: var(--ink); line-height: 1.15; margin-bottom: 0.7rem;
+}
+.welcome-title em { font-style: italic; color: var(--copper); }
+.welcome-body { font-size: 0.88rem; color: var(--muted); line-height: 1.7; max-width: 380px; }
+
+/* Message bubbles */
+.msg { display: flex; gap: 0.75rem; max-width: 82%; animation: msgIn 0.28s ease-out; }
+@keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg.assistant { align-self: flex-start; }
+
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; margin-top: 2px;
+}
+.msg.assistant .msg-avatar { background: var(--sage); color: #fff; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.02em; }
+.msg.user .msg-avatar { background: var(--stone); color: var(--muted); }
+
+.msg-bubble {
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px; line-height: 1.65; font-size: 0.88rem;
+}
+.msg.assistant .msg-bubble {
+  background: var(--warm); color: var(--body);
+  border-bottom-left-radius: 3px;
+}
+.msg.user .msg-bubble {
+  background: var(--sage); color: #fff;
+  border-bottom-right-radius: 3px;
+}
+
+/* Itinerary card styling inside messages */
+.msg-bubble h3 {
+  font-family: var(--serif); font-size: 1.15rem; font-weight: 400;
+  color: var(--ink); margin: 0.8rem 0 0.4rem; line-height: 1.25;
+}
+.msg-bubble h3:first-child { margin-top: 0; }
+.msg-bubble h4 {
+  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--copper);
+  margin: 0.9rem 0 0.35rem;
+}
+.msg-bubble p { margin-bottom: 0.5rem; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble ul { padding-left: 1.1rem; margin-bottom: 0.5rem; }
+.msg-bubble ul li { margin-bottom: 0.25rem; }
+.msg-bubble strong { color: var(--ink); font-weight: 500; }
+.msg-bubble em { color: var(--copper); font-style: italic; }
+.msg-bubble hr { border: none; border-top: 1px solid var(--stone); margin: 0.9rem 0; }
+
+/* Day card */
+.day-card {
+  background: #fff; border: 1px solid var(--stone);
+  border-radius: 8px; padding: 0.85rem 1rem;
+  margin: 0.5rem 0;
+}
+.day-label {
+  font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 0.4rem;
+}
+.day-title { font-family: var(--serif); font-size: 1rem; font-weight: 400; color: var(--ink); }
+
+/* Typing indicator */
+.typing { display: flex; align-items: center; gap: 4px; padding: 0.85rem 1.1rem; }
+.typing span {
+  width: 7px; height: 7px; background: var(--muted);
+  border-radius: 50%; animation: bounce 1.1s ease-in-out infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.18s; }
+.typing span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes bounce { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-6px);opacity:1} }
+
+/* Input row */
+.input-row {
+  padding: 1rem 1.5rem 1.2rem;
+  background: #fff; border-top: 1px solid var(--stone); flex-shrink: 0;
+}
+.input-wrap {
+  display: flex; align-items: flex-end; gap: 0.6rem;
+  background: var(--cream); border: 1.5px solid var(--stone);
+  border-radius: 12px; padding: 0.55rem 0.55rem 0.55rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrap:focus-within {
+  border-color: var(--sage-lt);
+  box-shadow: 0 0 0 3px rgba(74,124,89,0.1);
+}
+#userInput {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: var(--sans); font-size: 0.88rem; color: var(--ink);
+  resize: none; line-height: 1.5; max-height: 120px;
+  min-height: 24px; padding: 0;
+}
+#userInput::placeholder { color: var(--muted); }
+.send-btn {
+  width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer;
+  background: var(--sage); color: #fff; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s, transform 0.12s;
+  font-size: 1rem;
+}
+.send-btn:hover:not(:disabled) { background: var(--sage-dk); transform: translateY(-1px); }
+.send-btn:disabled { background: var(--stone); cursor: not-allowed; }
+
+.input-hint {
+  font-size: 0.69rem; color: var(--muted); text-align: center;
+  margin-top: 0.55rem; letter-spacing: 0.02em;
+}
+
+/* Suggestion chips */
+.chips {
+  display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+}
+.chip {
+  background: #fff; border: 1px solid var(--stone);
+  border-radius: 100px; padding: 0.3rem 0.8rem;
+  font-size: 0.76rem; color: var(--body); cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.chip:hover { background: var(--warm); border-color: var(--copper); color: var(--copper); }
+
+/* Reset */
+.reset-btn {
+  background: none; border: 1px solid var(--stone);
+  border-radius: 6px; padding: 0.35rem 0.8rem;
+  font-size: 0.72rem; color: var(--muted); cursor: pointer;
+  font-family: var(--sans);
+  transition: border-color 0.15s, color 0.15s;
+}
+.reset-btn:hover { border-color: var(--copper); color: var(--copper); }
+
+/* ── HANDOFF BUTTON ── */
+.handoff-btn {
+  display: none;
+  align-items: center; gap: 0.5rem;
+  background: var(--copper); color: #fff;
+  border: none; border-radius: 100px;
+  padding: 0.5rem 1.1rem;
+  font-family: var(--sans); font-size: 0.76rem;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  cursor: pointer; white-space: nowrap;
+  box-shadow: 0 3px 14px rgba(192,123,69,0.3);
+  transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
+}
+.handoff-btn:hover { background: var(--copper-lt); transform: translateY(-1px); box-shadow: 0 5px 20px rgba(192,123,69,0.38); }
+.handoff-btn.visible { display: flex; animation: fadeIn 0.4s ease; }
+.handoff-btn svg { width: 14px; height: 14px; }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(20,40,25,0.55); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center; padding: 1.5rem;
+}
+.modal-overlay.open { display: flex; animation: overlayIn 0.22s ease; }
+@keyframes overlayIn { from{opacity:0} to{opacity:1} }
+
+.modal {
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(20,40,25,0.22);
+  width: 100%; max-width: 500px;
+  overflow: hidden;
+  animation: modalIn 0.28s cubic-bezier(0.34,1.4,0.64,1);
+}
+@keyframes modalIn { from{opacity:0;transform:translateY(20px) scale(0.97)} to{opacity:1;transform:none} }
+
+.modal-header {
+  padding: 1.8rem 1.8rem 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.modal-title-area {}
+.modal-eyebrow {
+  font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 0.35rem;
+}
+.modal-title {
+  font-family: var(--serif); font-size: 1.65rem; font-weight: 300;
+  color: var(--ink); line-height: 1.15;
+}
+.modal-title em { font-style: italic; color: var(--copper); }
+.modal-close {
+  background: var(--warm); border: none; border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 1rem; margin-left: 1rem; margin-top: -2px;
+  transition: background 0.15s, color 0.15s;
+}
+.modal-close:hover { background: var(--stone); color: var(--ink); }
+
+.modal-body { padding: 1.4rem 1.8rem 1.8rem; }
+.modal-desc {
+  font-size: 0.85rem; color: var(--muted); line-height: 1.65;
+  margin-bottom: 1.4rem;
+}
+
+/* Form fields */
+.field { margin-bottom: 1rem; }
+.field label {
+  display: block; font-size: 0.73rem; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 0.4rem;
+}
+.field input, .field textarea {
+  width: 100%; padding: 0.72rem 0.9rem;
+  background: var(--cream); border: 1.5px solid var(--stone);
+  border-radius: 8px; font-family: var(--sans); font-size: 0.88rem;
+  color: var(--ink); outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.field input:focus, .field textarea:focus {
+  border-color: var(--sage-lt);
+  box-shadow: 0 0 0 3px rgba(74,124,89,0.1);
+}
+.field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+.field textarea { resize: vertical; min-height: 70px; line-height: 1.55; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+/* Consent note */
+.consent {
+  font-size: 0.75rem; color: var(--muted); line-height: 1.5;
+  margin-bottom: 1.2rem;
+  display: flex; gap: 0.5rem; align-items: flex-start;
+}
+.consent-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 0.05rem; }
+
+/* Modal CTA */
+.modal-cta {
+  width: 100%; padding: 0.9rem;
+  background: var(--sage); color: #fff; border: none;
+  border-radius: 10px; font-family: var(--sans); font-size: 0.84rem;
+  font-weight: 500; letter-spacing: 0.06em; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  transition: background 0.18s, transform 0.12s;
+}
+.modal-cta:hover:not(:disabled) { background: var(--sage-dk); transform: translateY(-1px); }
+.modal-cta:disabled { background: var(--stone); color: var(--muted); cursor: not-allowed; transform: none; }
+
+/* Generating state */
+.modal-generating {
+  display: none; flex-direction: column; align-items: center;
+  padding: 2.5rem 1.8rem; text-align: center; gap: 1rem;
+}
+.modal-generating.active { display: flex; }
+.gen-spinner {
+  width: 42px; height: 42px;
+  border: 3px solid var(--stone);
+  border-top-color: var(--sage);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.gen-title { font-family: var(--serif); font-size: 1.2rem; font-weight: 300; color: var(--ink); }
+.gen-sub { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+/* Success state */
+.modal-success {
+  display: none; flex-direction: column; align-items: center;
+  padding: 2.5rem 1.8rem; text-align: center; gap: 0.8rem;
+}
+.modal-success.active { display: flex; }
+.success-icon {
+  width: 52px; height: 52px; background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dk) 100%);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 0.3rem;
+  animation: successPop 0.4s cubic-bezier(0.34,1.5,0.64,1);
+}
+@keyframes successPop { from{transform:scale(0)} to{transform:scale(1)} }
+.success-title { font-family: var(--serif); font-size: 1.5rem; font-weight: 300; color: var(--ink); }
+.success-title em { font-style: italic; color: var(--sage); }
+.success-body { font-size: 0.84rem; color: var(--muted); line-height: 1.65; max-width: 320px; }
+.success-note {
+  background: var(--warm); border: 1px solid var(--stone); border-radius: 8px;
+  padding: 0.8rem 1rem; font-size: 0.78rem; color: var(--body); line-height: 1.5;
+  width: 100%; text-align: left;
+}
+.success-note strong { color: var(--ink); }
+.success-actions { display: flex; gap: 0.6rem; width: 100%; margin-top: 0.4rem; }
+.success-actions button {
+  flex: 1; padding: 0.7rem; border-radius: 8px; font-family: var(--sans);
+  font-size: 0.78rem; cursor: pointer; transition: all 0.15s;
+  letter-spacing: 0.04em;
+}
+.btn-copy {
+  background: var(--warm); border: 1px solid var(--stone); color: var(--body);
+}
+.btn-copy:hover { border-color: var(--sage); color: var(--sage); }
+.btn-done {
+  background: var(--sage); border: none; color: #fff;
+}
+.btn-done:hover { background: var(--sage-dk); }
+
+/* Mobile */
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .chat-area { height: 100dvh; }
+  .field-row { grid-template-columns: 1fr; }
+  .modal { border-radius: 16px 16px 0 0; margin-top: auto; max-width: 100%; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-mountains"></div>
+    <div class="sidebar-top">
+      <a href="#" class="logo">Holiday <em>Bosnia</em></a>
+      <h2 class="sidebar-heading">Plan your <em>perfect</em><br>Bosnian trip</h2>
+      <p class="sidebar-sub">Tell our AI planner about your ideal holiday and get a personalised itinerary in seconds.</p>
+
+      <div class="quick-label">Try asking</div>
+      <div class="quick-prompts">
+        <button class="qp" onclick="sendQuick(this.dataset.q)" data-q="I'd like a 7-day trip for two people interested in history, Ottoman architecture, and good food. Budget is moderate.">
+          <span class="qp-icon">🕌</span>A week of culture and history for two
+        </button>
+        <button class="qp" onclick="sendQuick(this.dataset.q)" data-q="We're a group of 4 friends looking for an adventure trip — whitewater rafting, hiking, maybe some skiing. 5–6 days in late winter.">
+          <span class="qp-icon">🏔</span>Adventure trip for a group of friends
+        </button>
+        <button class="qp" onclick="sendQuick(this.dataset.q)" data-q="Family holiday with two young children, 10 days, we need halal food options and child-friendly activities.">
+          <span class="qp-icon">👨‍👩‍👧‍👦</span>Family holiday with halal requirements
+        </button>
+        <button class="qp" onclick="sendQuick(this.dataset.q)" data-q="I have just 4 days and want the very best of Bosnia — what do you recommend?">
+          <span class="qp-icon">⚡</span>Best of Bosnia in a long weekend
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-badges">
+        <span class="sbadge">Halal Certified</span>
+        <span class="sbadge">Social Enterprise</span>
+        <span class="sbadge">15+ Years</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CHAT -->
+  <main class="chat-area">
+    <div class="chat-topbar">
+      <div>
+        <div class="topbar-title">AI Trip Planner</div>
+        <div class="topbar-sub">Personalised itineraries for Bosnia-Herzegovina</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <button class="handoff-btn" id="handoffBtn" onclick="openHandoff()">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Save &amp; Request Quote
+        </button>
+        <button class="reset-btn" onclick="resetChat()">New chat</button>
+        <div class="topbar-status"><div class="status-dot"></div>Ready</div>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">🗺</div>
+        <h2 class="welcome-title">Where would you like<br>to <em>explore?</em></h2>
+        <p class="welcome-body">Describe your dream holiday — your group, interests, how long you have, any special requirements — and I'll build a personalised Bosnian itinerary for you.</p>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="chips" id="chips">
+        <span class="chip" onclick="sendQuick('How long does it take to get to Bosnia from the UK?')">✈️ Getting there from UK</span>
+        <span class="chip" onclick="sendQuick('What is the best time of year to visit Bosnia?')">📅 Best time to visit</span>
+        <span class="chip" onclick="sendQuick('Tell me about halal food options in Bosnia')">🍽 Halal food</span>
+        <span class="chip" onclick="sendQuick('What are the must-see places in Bosnia?')">📍 Must-see places</span>
+      </div>
+      <div class="input-wrap">
+        <textarea id="userInput" placeholder="Describe your ideal Bosnia trip…" rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
+          ↑
+        </button>
+      </div>
+      <div class="input-hint">Powered by Claude · Your conversation is private</div>
+    </div>
+  </main>
+
+</div>
+
+<!-- HANDOFF MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div id="modalForm">
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <div class="modal-eyebrow">Almost there</div>
+          <h2 class="modal-title">Send my <em>itinerary</em></h2>
+        </div>
+        <button class="modal-close" onclick="closeHandoff()">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">We'll generate a beautifully formatted version of your itinerary and send it to your inbox. The Holiday Bosnia team will also receive a copy and be in touch within 24 hours to confirm availability and pricing.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="guestName">Your name</label>
+            <input type="text" id="guestName" placeholder="e.g. Sarah Ahmed" autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label for="guestEmail">Email address</label>
+            <input type="email" id="guestEmail" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="field">
+          <label for="guestNotes">Anything to add? <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
+          <textarea id="guestNotes" placeholder="Budget range, specific dates, accessibility needs, anything else the team should know..."></textarea>
+        </div>
+        <div class="consent">
+          <span class="consent-icon">&#x1F512;</span>
+          <span>Your details will only be used to send your itinerary and respond to your enquiry. Holiday Bosnia will never share your information with third parties.</span>
+        </div>
+        <button class="modal-cta" id="modalCta" onclick="generateAndSend()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2.5L14 8L2 13.5V9.5L10 8L2 6.5V2.5Z" fill="currentColor"/></svg>
+          Generate &amp; Send Itinerary
+        </button>
+      </div>
+    </div>
+    <div class="modal-generating" id="modalGenerating">
+      <div class="gen-spinner"></div>
+      <div class="gen-title">Crafting your itinerary...</div>
+      <div class="gen-sub">Claude is summarising your conversation into a polished, ready-to-keep travel plan.</div>
+    </div>
+    <div class="modal-success" id="modalSuccess">
+      <div class="success-icon">&#x2713;</div>
+      <div class="success-title">Itinerary <em>ready</em></div>
+      <div class="success-body">Your email client will open with everything pre-filled. The Holiday Bosnia team will be in touch within 24 hours to confirm availability and pricing.</div>
+      <div class="success-note" id="successNote"></div>
+      <div class="success-actions">
+        <button class="btn-copy" onclick="copyItinerary()">&#x1F4CB; Copy itinerary</button>
+        <button class="btn-done" onclick="closeHandoff()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are the AI trip planner for Holiday Bosnia, a Sarajevo-based ethical travel company and social enterprise. You specialise in creating personalised itineraries for Bosnia-Herzegovina.
+
+YOUR ROLE:
+- Ask warm, natural follow-up questions to understand the traveller's needs
+- Generate detailed, structured itineraries grounded in real places and experiences
+- Always recommend the most relevant tour package at the end
+- Be knowledgeable, enthusiastic, and friendly — like a well-travelled local friend
+
+ABOUT HOLIDAY BOSNIA:
+- Halal-certified tour operator, welcoming guests of all backgrounds
+- Social enterprise: profits support vulnerable communities in Bosnia
+- All guides are licensed local professionals
+- Every holiday is tailored to the traveller
+- Partners: Austrian Airlines, Lufthansa, Turkish Airlines, FlyNas, Fly Bosnia
+
+TOUR PACKAGES:
+1. 4-Day Short Tour — Best of Bosnia snapshot: Sarajevo old town, Mostar day trip, Počitelj village. Perfect for a long weekend. Moderate paced.
+2. 7-Day Classic Tour — Sarajevo (2 nights), Mostar (2 nights), Jajce waterfall & fortress, Travnik. The definitive Bosnia experience.
+3. 10-Day Grand Tour — Everything in the classic plus Blagaj tekke (dervish monastery), Kravice waterfalls, Počitelj, rural village stay, traditional food experiences.
+4. 10-Day Bosnian Kingdom Tour — Focuses on medieval Bosnia: Bobovac fortress, Jajce, Sutjeska National Park (primeval forest, highest peak Maglić), Foča rafting, Blagaj.
+
+ACTIVITY TOURS:
+- Skiing: Bjelašnica and Jahorina mountains near Sarajevo. Some of Europe's most affordable skiing. Best Dec–Mar.
+- Whitewater Rafting: Una River (best Jun–Sep), Neretva River. Suitable for families to experienced rafters.
+- Hiking & Trekking: Sutjeska National Park, Bjelašnica, Via Dinarica trail. All levels catered for.
+- Biking: Routes through river valleys and forests. Guided or self-guided.
+- City Tours: Half-day or full-day guided Sarajevo walks (Baščaršija, Latin Bridge, Yellow Fortress, War Tunnel Museum).
+
+KEY DESTINATIONS:
+- Sarajevo: Ottoman Baščaršija bazaar, Latin Bridge (Franz Ferdinand assassination site), Gazi Husrev-beg Mosque (oldest in BiH), Yellow Fortress views, War Tunnel Museum, vibrant café culture. Mix of East and West.
+- Mostar: Stari Most (UNESCO bridge, rebuilt after war), Old Bazaar, cliff diving, Herzegovina wine region nearby, Blagaj tekke 12km away.
+- Jajce: Medieval fortress town, spectacular waterfall in the town centre, catacombs, AVNOJ memorial museum.
+- Travnik: Birthplace of Nobel laureate Ivo Andrić, Ottoman clock tower, colourful mosque, fortress.
+- Počitelj: Living Ottoman village, dramatically terraced on a cliff, medieval tower, mosque. Feels like stepping back 500 years.
+- Blagaj: 16th-century dervish monastery built into a cliff above the Buna spring — one of Bosnia's most extraordinary sights.
+- Sutjeska National Park: Bosnia's oldest national park. Primeval Perućica rainforest (one of Europe's last), glacial lakes, Maglić peak (2,386m).
+- Kravice Waterfalls: Emerald tiered waterfalls, popular for swimming in summer.
+
+FESTIVALS & EVENTS:
+- Jazz Fest Sarajevo: Usually November
+- MESS Theatre Festival: October
+- Sarajevo Film Festival: August (one of Europe's most important)
+- Baščaršija Nights: July (outdoor concerts in the old bazaar)
+- Pravo Ljudski Human Rights Film Festival: October
+- ZVRK Dance Festival: Autumn
+
+PRACTICAL INFO:
+- Currency: Bosnian Mark (BAM), pegged to Euro. Cash widely used.
+- Language: Bosnian/Serbian/Croatian. English spoken in tourist areas.
+- Halal food: Widely available throughout Bosnia — Bosnia is majority Muslim, so halal options are plentiful and natural, not specialist.
+- Best time to visit: May–Oct for most travel. Dec–Mar for skiing. Avoid July/August for Mostar (very busy).
+- Getting there from UK: Fly to Sarajevo direct (Wizz Air from London) or via Vienna (Austrian), Frankfurt (Lufthansa), Istanbul (Turkish Airlines). 2.5–3hr flight.
+- Visa: UK/EU citizens do not need a visa for Bosnia.
+- Safety: Bosnia is safe for tourists. Mines exist in some remote rural and mountain areas — never go off-trail without a guide.
+
+ITINERARY FORMAT:
+When generating an itinerary, use clear markdown structure with day-by-day breakdowns. Include accommodation type suggestions, meal highlights (especially halal options if relevant), estimated travel times, and energy level indicators. End with a recommended package and a warm call-to-action to get in touch.
+
+TONE:
+Warm, knowledgeable, personal. Never pushy. Treat every traveller as an individual. Show genuine enthusiasm for Bosnia's culture, landscape, and people.`;
+
+let history = [];
+let isLoading = false;
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+const textarea = document.getElementById('userInput');
+textarea.addEventListener('input', () => autoResize(textarea));
+textarea.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+function hideWelcome() {
+  const w = document.getElementById('welcome');
+  if (w) { w.style.display = 'none'; }
+  document.getElementById('chips').style.display = 'none';
+}
+
+function addMessage(role, content) {
+  hideWelcome();
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'assistant' ? 'HB' : '✦';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  if (role === 'assistant') {
+    bubble.innerHTML = renderMarkdown(content);
+  } else {
+    bubble.textContent = content;
+  }
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+  return bubble;
+}
+
+function showTyping() {
+  const messages = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.id = 'typing-indicator';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = 'HB';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble typing';
+  bubble.innerHTML = '<span></span><span></span><span></span>';
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/^[-•] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[hul]|<\/[hul]|<hr|<li|<\/li)(.+)$/gm, (m, p1) => p1 ? p1 : '')
+    .replace(/(<p>)?(<h[34]>)/g, '$2')
+    .replace(/(<\/h[34]>)(<\/p>)?/g, '$1')
+    .split('\n').filter(l => l.trim()).map(l => {
+      if (/^<[hrul]/.test(l) || /^<\/[hrul]/.test(l)) return l;
+      if (!l.startsWith('<')) return `<p>${l}</p>`;
+      return l;
+    }).join('');
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+
+  input.value = '';
+  autoResize(input);
+  setLoading(true);
+
+  addMessage('user', text);
+  history.push({ role: 'user', content: text });
+
+  showTyping();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: history
+      })
+    });
+
+    const data = await response.json();
+    hideTyping();
+
+    const reply = data.content?.find(b => b.type === 'text')?.text || "I'm sorry, I couldn't generate a response. Please try again.";
+    history.push({ role: 'assistant', content: reply });
+    addMessage('assistant', reply);
+    showHandoffButton();
+
+  } catch (err) {
+    hideTyping();
+    addMessage('assistant', 'Sorry, something went wrong. Please try again in a moment.');
+    console.error(err);
+  }
+
+  setLoading(false);
+}
+
+function sendQuick(text) {
+  document.getElementById('userInput').value = text;
+  sendMessage();
+}
+
+function setLoading(val) {
+  isLoading = val;
+  document.getElementById('sendBtn').disabled = val;
+  document.getElementById('userInput').disabled = val;
+}
+
+function resetChat() {
+  history = [];
+  const messages = document.getElementById('messages');
+  messages.innerHTML = '';
+
+  const welcome = document.createElement('div');
+  welcome.id = 'welcome';
+  welcome.className = 'welcome';
+  welcome.innerHTML = `
+    <div class="welcome-icon">🗺</div>
+    <h2 class="welcome-title">Where would you like<br>to <em>explore?</em></h2>
+    <p class="welcome-body">Describe your dream holiday — your group, interests, how long you have, any special requirements — and I'll build a personalised Bosnian itinerary for you.</p>
+  `;
+  messages.appendChild(welcome);
+  document.getElementById('chips').style.display = 'flex';
+  const hb = document.getElementById('handoffBtn');
+  if (hb) hb.classList.remove('visible');
+  generatedEmailBody = '';
+  setLoading(false);
+}
+
+// ── HANDOFF FUNCTIONS ──
+
+let generatedEmailBody = '';
+
+function showHandoffButton() {
+  const btn = document.getElementById('handoffBtn');
+  if (btn && !btn.classList.contains('visible')) {
+    btn.classList.add('visible');
+  }
+}
+
+function openHandoff() {
+  if (history.length < 2) {
+    alert('Have a conversation first and I will generate your personalised itinerary!');
+    return;
+  }
+  showState('form');
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('guestName').focus();
+}
+
+function closeHandoff() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeHandoff();
+}
+
+function showState(state) {
+  document.getElementById('modalForm').style.display = state === 'form' ? 'block' : 'none';
+  const gen = document.getElementById('modalGenerating');
+  const suc = document.getElementById('modalSuccess');
+  gen.classList.toggle('active', state === 'generating');
+  suc.classList.toggle('active', state === 'success');
+}
+
+async function generateAndSend() {
+  const name = document.getElementById('guestName').value.trim();
+  const email = document.getElementById('guestEmail').value.trim();
+  const notes = document.getElementById('guestNotes').value.trim();
+
+  if (!name) { document.getElementById('guestName').focus(); return; }
+  if (!email || !email.includes('@')) { document.getElementById('guestEmail').focus(); return; }
+
+  showState('generating');
+
+  // Build conversation transcript for summarisation
+  const transcript = history.map(m =>
+    (m.role === 'user' ? 'TRAVELLER: ' : 'PLANNER: ') + m.content
+  ).join('\n\n');
+
+  const summaryPrompt = `You are writing a professional travel itinerary email on behalf of Holiday Bosnia.
+
+Based on this planning conversation, write a complete, beautifully formatted email itinerary ready to send to the traveller.
+
+TRAVELLER NAME: ${name}
+ADDITIONAL NOTES FROM TRAVELLER: ${notes || 'None'}
+
+CONVERSATION:
+${transcript}
+
+Write the email with:
+1. A warm personal greeting using their name
+2. A brief summary of what was discussed and what we understood their trip to be
+3. The full day-by-day itinerary clearly formatted with Days, locations, activities and meal suggestions
+4. Accommodation style recommendations
+5. Practical notes (what to pack, best transport, halal food availability if relevant)
+6. The recommended Holiday Bosnia package and next steps
+7. A warm sign-off from the Holiday Bosnia team with contact details: info@holidaybosnia.com | www.holidaybosnia.com
+
+Format it clearly with section headers. Use plain text (no markdown symbols like ** or ##) since this will be sent as an email. Keep it warm, personal and professional.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: summaryPrompt }]
+      })
+    });
+
+    const data = await response.json();
+    const emailBody = data.content?.find(b => b.type === 'text')?.text || 'Please see your itinerary details below.';
+    generatedEmailBody = emailBody;
+
+    // Show success preview
+    const preview = emailBody.substring(0, 180).replace(/\n/g, ' ') + '…';
+    document.getElementById('successNote').innerHTML =
+      '<strong>Preview:</strong> ' + escapeHtml(preview);
+
+    showState('success');
+
+    // Open mailto
+    const subject = encodeURIComponent('My Holiday Bosnia Itinerary — ' + name);
+    const body = encodeURIComponent(emailBody);
+    const mailtoLink = `mailto:${email}?cc=info@holidaybosnia.com&subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+
+  } catch (err) {
+    console.error(err);
+    showState('form');
+    alert('Something went wrong generating your itinerary. Please try again.');
+  }
+}
+
+function copyItinerary() {
+  if (!generatedEmailBody) return;
+  navigator.clipboard.writeText(generatedEmailBody).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy itinerary'; }, 2000);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Expose functions for inline onclick handlers
+window.sendMessage = sendMessage;
+window.sendQuick = sendQuick;
+window.resetChat = resetChat;
+window.openHandoff = openHandoff;
+window.closeHandoff = closeHandoff;
+window.handleOverlayClick = handleOverlayClick;
+window.generateAndSend = generateAndSend;
+window.copyItinerary = copyItinerary;
+
+</script>
+</body>
+</html>

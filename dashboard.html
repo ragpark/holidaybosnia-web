@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holiday Bosnia — Operations Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Brand */
+  --sage:      #4a7c59;
+  --sage-lt:   #6a9c79;
+  --sage-dk:   #2e5238;
+  --copper:    #c07b45;
+  --copper-lt: #d49060;
+  --cream:     #faf7f2;
+  --warm:      #f3ede3;
+  --stone:     #e8e0d2;
+  --ink:       #1c2b1f;
+  --body:      #3d4f40;
+  --muted:     #7a9080;
+  /* Shell chrome */
+  --shell-bg:  #0f1612;
+  --shell-s1:  #161e18;
+  --shell-s2:  #1c2820;
+  --shell-b:   rgba(255,255,255,0.07);
+  --shell-b2:  rgba(255,255,255,0.12);
+  --shell-txt: rgba(245,240,232,0.85);
+  --shell-dim: rgba(245,240,232,0.32);
+  /* Status colours */
+  --green:  #5a9e6f;
+  --amber:  #d4a24a;
+  --red:    #e05252;
+  --blue:   #5a8fb5;
+  /* Type */
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'DM Sans', sans-serif;
+  --mono:  'DM Mono', monospace;
+}
+
+html, body {
+  height: 100%; font-family: var(--sans);
+  background: var(--shell-bg); color: var(--shell-txt);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════
+   LAYOUT GRID
+══════════════════════════════════════ */
+.platform {
+  display: grid;
+  grid-template-columns: 56px 220px 1fr;
+  grid-template-rows: 48px 1fr 28px;
+  height: 100vh;
+}
+
+/* ══════════════════════════════════════
+   GLOBAL TOPBAR  (full width, row 1)
+══════════════════════════════════════ */
+.g-topbar {
+  grid-column: 1 / -1;
+  background: var(--shell-s1);
+  border-bottom: 1px solid var(--shell-b);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.2rem 0 0;
+  z-index: 50;
+}
+
+.g-tb-left {
+  display: flex; align-items: center; height: 100%;
+}
+
+/* Logo block — same width as icon rail */
+.g-logo-block {
+  width: 56px; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  border-right: 1px solid var(--shell-b);
+  flex-shrink: 0;
+}
+.g-logo-mark {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--sage-dk) 0%, var(--sage) 100%);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 0.85rem; font-weight: 400;
+  color: rgba(255,255,255,0.9); letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.g-logo-mark:hover { transform: scale(1.07); }
+
+.g-wordmark-block {
+  padding: 0 1.2rem;
+  display: flex; align-items: center; gap: 0.8rem;
+  border-right: 1px solid var(--shell-b);
+  height: 100%;
+}
+.g-wordmark {
+  font-family: var(--serif); font-size: 1rem; font-weight: 400;
+  color: var(--shell-txt); letter-spacing: 0.03em; white-space: nowrap;
+}
+.g-wordmark em { font-style: italic; color: rgba(212,160,86,0.75); font-weight: 300; }
+.g-platform-label {
+  font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--shell-dim); white-space: nowrap;
+}
+
+/* Breadcrumb */
+.g-breadcrumb {
+  padding: 0 1.2rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.75rem; color: var(--shell-dim);
+}
+.g-breadcrumb .sep { opacity: 0.4; }
+.g-breadcrumb .current { color: var(--shell-txt); }
+
+.g-tb-right {
+  display: flex; align-items: center; gap: 0.6rem;
+}
+
+/* Global search */
+.g-search {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--shell-s2); border: 1px solid var(--shell-b2);
+  border-radius: 7px; padding: 0.3rem 0.7rem;
+  transition: border-color 0.2s;
+}
+.g-search:focus-within { border-color: rgba(90,158,111,0.4); }
+.g-search input {
+  background: none; border: none; outline: none;
+  font-family: var(--sans); font-size: 0.78rem;
+  color: var(--shell-txt); width: 160px;
+}
+.g-search input::placeholder { color: var(--shell-dim); }
+.g-search .si { font-size: 0.72rem; color: var(--shell-dim); flex-shrink: 0; }
+
+/* Notification bell */
+.g-notif {
+  position: relative; cursor: pointer;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--shell-s2); border: 1px solid var(--shell-b);
+  border-radius: 7px; font-size: 0.9rem;
+  transition: border-color 0.15s;
+}
+.g-notif:hover { border-color: var(--shell-b2); }
+.g-notif .badge {
+  position: absolute; top: -4px; right: -4px;
+  width: 14px; height: 14px; background: var(--red);
+  border-radius: 50%; border: 1.5px solid var(--shell-s1);
+  font-size: 0.5rem; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 600; font-family: var(--mono);
+}
+
+/* User avatar */
+.g-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--sage-dk) 0%, var(--copper) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 600; color: #fff; cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+/* Status pill */
+.g-status {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.22rem 0.65rem; border-radius: 100px;
+  border: 1px solid rgba(90,158,111,0.3);
+  color: var(--green); background: rgba(90,158,111,0.08);
+  white-space: nowrap;
+}
+.g-status-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); animation: sdot 2.5s ease-in-out infinite;
+}
+@keyframes sdot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ══════════════════════════════════════
+   ICON RAIL  (col 1, row 2)
+══════════════════════════════════════ */
+.icon-rail {
+  background: var(--shell-s1);
+  border-right: 1px solid var(--shell-b);
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 0.6rem 0;
+  gap: 0.3rem;
+  z-index: 40;
+}
+
+.ir-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; cursor: pointer; font-size: 1rem;
+  transition: background 0.15s, transform 0.1s;
+  border: 1px solid transparent;
+  position: relative;
+}
+.ir-btn:hover { background: var(--shell-s2); }
+.ir-btn.active {
+  background: rgba(90,158,111,0.15);
+  border-color: rgba(90,158,111,0.2);
+}
+.ir-btn .ir-dot {
+  position: absolute; top: 3px; right: 3px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red); border: 1px solid var(--shell-s1);
+  display: none;
+}
+.ir-btn.has-alert .ir-dot { display: block; }
+.ir-sep {
+  width: 24px; height: 1px; background: var(--shell-b);
+  margin: 0.2rem 0;
+}
+
+/* Tooltip */
+.ir-btn::after {
+  content: attr(data-tip);
+  position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%);
+  background: var(--shell-s1); border: 1px solid var(--shell-b2);
+  color: var(--shell-txt); font-size: 0.72rem; font-family: var(--sans);
+  padding: 0.28rem 0.65rem; border-radius: 5px; white-space: nowrap;
+  pointer-events: none; opacity: 0; transition: opacity 0.15s;
+  z-index: 100;
+}
+.ir-btn:hover::after { opacity: 1; }
+
+/* ══════════════════════════════════════
+   SIDEBAR NAV  (col 2, row 2)
+══════════════════════════════════════ */
+.sidebar {
+  background: var(--shell-s1);
+  border-right: 1px solid var(--shell-b);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  z-index: 40;
+}
+
+.sidebar-section { margin-bottom: 0.3rem; }
+.ss-label {
+  font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--shell-dim); padding: 0.75rem 1rem 0.35rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0.52rem 1rem 0.52rem 0.9rem;
+  cursor: pointer; font-size: 0.8rem; color: var(--shell-dim);
+  border-left: 2px solid transparent;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  text-decoration: none; position: relative;
+  user-select: none;
+}
+.nav-item:hover { background: var(--shell-s2); color: var(--shell-txt); }
+.nav-item.active {
+  background: rgba(90,158,111,0.1);
+  color: rgba(245,240,232,0.95);
+  border-left-color: var(--sage);
+}
+.nav-item .ni-icon { font-size: 0.88rem; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-item .ni-label { flex: 1; }
+.nav-badge {
+  font-size: 0.6rem; font-weight: 600; font-family: var(--mono);
+  padding: 0.1rem 0.4rem; border-radius: 100px; min-width: 18px; text-align: center;
+}
+.nav-badge.red   { background: rgba(224,82,82,0.2); color: var(--red); }
+.nav-badge.amber { background: rgba(212,162,74,0.15); color: var(--amber); }
+.nav-badge.green { background: rgba(90,158,111,0.15); color: var(--green); }
+.nav-badge.blue  { background: rgba(90,143,181,0.15); color: var(--blue); }
+
+/* Section divider */
+.nav-sep {
+  height: 1px; background: var(--shell-b); margin: 0.4rem 0.8rem;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--shell-b);
+  padding: 0.8rem;
+}
+.sf-status {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: rgba(90,158,111,0.07); border: 1px solid rgba(90,158,111,0.15);
+  border-radius: 7px; padding: 0.55rem 0.7rem;
+  font-size: 0.72rem; color: rgba(245,240,232,0.55); line-height: 1.4;
+}
+.sf-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); flex-shrink: 0;
+  animation: sdot 2.5s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════
+   CONTENT AREA  (col 3, row 2)
+══════════════════════════════════════ */
+.content-area {
+  position: relative; overflow: hidden;
+  background: var(--shell-bg);
+}
+
+/* iframe views */
+.view {
+  position: absolute; inset: 0;
+  display: none;
+  flex-direction: column;
+}
+.view.active { display: flex; }
+
+.view iframe {
+  flex: 1; width: 100%; border: none;
+  background: transparent;
+}
+
+/* Overview / Home view */
+.home-view {
+  padding: 1.8rem;
+  overflow-y: auto;
+  background: var(--shell-bg);
+}
+.home-view::-webkit-scrollbar { width: 3px; }
+.home-view::-webkit-scrollbar-thumb { background: var(--shell-b2); }
+
+.home-greeting {
+  margin-bottom: 1.8rem;
+}
+.home-greeting h1 {
+  font-family: var(--serif);
+  font-size: 1.8rem; font-weight: 300;
+  color: var(--shell-txt); line-height: 1.15; margin-bottom: 0.3rem;
+}
+.home-greeting h1 em { font-style: italic; color: rgba(212,160,86,0.75); }
+.home-greeting p { font-size: 0.83rem; color: var(--shell-dim); }
+
+/* KPI row */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-bottom: 1.5rem; }
+.kpi {
+  background: var(--shell-s1); border: 1px solid var(--shell-b);
+  border-radius: 9px; padding: 1rem 1.1rem;
+  transition: border-color 0.2s;
+}
+.kpi:hover { border-color: var(--shell-b2); }
+.kpi-label { font-size: 0.63rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--shell-dim); margin-bottom: 0.5rem; }
+.kpi-value { font-family: var(--mono); font-size: 1.5rem; font-weight: 500; color: var(--shell-txt); line-height: 1; margin-bottom: 0.25rem; }
+.kpi-delta { font-size: 0.7rem; color: var(--green); }
+.kpi-delta.down { color: var(--red); }
+.kpi-delta.neutral { color: var(--shell-dim); }
+
+/* Tool launcher cards */
+.launchers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.launcher {
+  background: var(--shell-s1); border: 1px solid var(--shell-b);
+  border-radius: 10px; padding: 1.2rem;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; flex-direction: column; gap: 0.8rem;
+  position: relative; overflow: hidden;
+}
+.launcher::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.launcher.planner::before  { background: linear-gradient(90deg, var(--sage), var(--sage-lt)); }
+.launcher.triage::before   { background: linear-gradient(90deg, var(--copper), var(--copper-lt)); }
+.launcher.pricing::before  { background: linear-gradient(90deg, var(--blue), #7ab5d8); }
+.launcher:hover { border-color: var(--shell-b2); transform: translateY(-2px); }
+.launcher:hover::before { opacity: 1; }
+
+.launcher-icon {
+  width: 38px; height: 38px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+}
+.launcher.planner .launcher-icon  { background: rgba(90,158,111,0.15); }
+.launcher.triage  .launcher-icon  { background: rgba(192,123,69,0.15); }
+.launcher.pricing .launcher-icon  { background: rgba(90,143,181,0.15); }
+
+.launcher-name {
+  font-size: 0.88rem; font-weight: 500; color: var(--shell-txt);
+  margin-bottom: 0.2rem;
+}
+.launcher-desc { font-size: 0.76rem; color: var(--shell-dim); line-height: 1.55; }
+.launcher-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: auto;
+}
+.launcher-badge {
+  font-size: 0.62rem; padding: 0.15rem 0.5rem; border-radius: 100px;
+  border: 1px solid var(--shell-b2); color: var(--shell-dim);
+}
+.launcher-arrow { font-size: 0.75rem; color: var(--shell-dim); }
+
+/* Activity feed */
+.home-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.hc-card {
+  background: var(--shell-s1); border: 1px solid var(--shell-b);
+  border-radius: 9px; overflow: hidden;
+}
+.hc-head {
+  padding: 0.8rem 1rem; border-bottom: 1px solid var(--shell-b);
+  font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--shell-dim); display: flex; justify-content: space-between;
+}
+.hc-body { padding: 0.6rem 0; }
+.activity-item {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  padding: 0.55rem 1rem; font-size: 0.77rem; color: var(--shell-dim);
+  line-height: 1.45;
+}
+.activity-item:hover { background: var(--shell-s2); }
+.ai-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  margin-top: 5px;
+}
+.ai-text strong { color: rgba(245,240,232,0.7); font-weight: 500; }
+.ai-time { margin-left: auto; font-family: var(--mono); font-size: 0.65rem; flex-shrink: 0; }
+
+/* ══════════════════════════════════════
+   STATUS BAR  (row 3, full width)
+══════════════════════════════════════ */
+.statusbar {
+  grid-column: 1 / -1;
+  background: var(--shell-s1);
+  border-top: 1px solid var(--shell-b);
+  display: flex; align-items: center; gap: 1.5rem;
+  padding: 0 1rem;
+  font-size: 0.62rem; font-family: var(--mono);
+  color: var(--shell-dim);
+}
+.sb-item { display: flex; align-items: center; gap: 0.4rem; }
+.sb-dot { width: 5px; height: 5px; border-radius: 50%; }
+.sb-dot.green { background: var(--green); animation: sdot 3s ease-in-out infinite; }
+.sb-dot.amber { background: var(--amber); }
+.sb-dot.dim   { background: var(--shell-b2); }
+.sb-sep { width: 1px; height: 12px; background: var(--shell-b); }
+.sb-right { margin-left: auto; }
+
+/* ══════════════════════════════════════
+   NOTIFICATION DRAWER
+══════════════════════════════════════ */
+.notif-drawer {
+  position: fixed; top: 48px; right: 0; width: 300px; height: calc(100vh - 48px - 28px);
+  background: var(--shell-s1); border-left: 1px solid var(--shell-b2);
+  z-index: 200; transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column;
+}
+.notif-drawer.open { transform: translateX(0); }
+.nd-head {
+  padding: 1rem 1.1rem 0.8rem;
+  border-bottom: 1px solid var(--shell-b);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.nd-title { font-size: 0.8rem; font-weight: 500; color: var(--shell-txt); }
+.nd-close {
+  background: none; border: none; color: var(--shell-dim);
+  cursor: pointer; font-size: 1rem; padding: 0.1rem; line-height: 1;
+}
+.nd-close:hover { color: var(--shell-txt); }
+.nd-body { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
+.nd-item {
+  padding: 0.7rem 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer; transition: background 0.12s;
+}
+.nd-item:hover { background: var(--shell-s2); }
+.nd-item-type {
+  font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+  margin-bottom: 0.3rem; font-weight: 600;
+}
+.nd-item-type.alert  { color: var(--red); }
+.nd-item-type.info   { color: var(--blue); }
+.nd-item-type.price  { color: var(--green); }
+.nd-item-body { font-size: 0.77rem; color: rgba(245,240,232,0.65); line-height: 1.45; }
+.nd-item-body strong { color: var(--shell-txt); font-weight: 500; }
+.nd-item-time { font-size: 0.62rem; color: var(--shell-dim); font-family: var(--mono); margin-top: 0.25rem; }
+
+/* Command palette backdrop */
+.cmd-backdrop {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  display: none; align-items: flex-start; justify-content: center;
+  padding-top: 15vh;
+}
+.cmd-backdrop.open { display: flex; }
+.cmd-box {
+  background: var(--shell-s1); border: 1px solid var(--shell-b2);
+  border-radius: 12px; width: 480px; max-width: 90vw;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  overflow: hidden;
+  animation: cmdIn 0.18s ease;
+}
+@keyframes cmdIn { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:none} }
+.cmd-input-wrap {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--shell-b);
+}
+.cmd-input-wrap span { font-size: 0.9rem; color: var(--shell-dim); }
+.cmd-input {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: var(--sans); font-size: 0.88rem; color: var(--shell-txt);
+}
+.cmd-input::placeholder { color: var(--shell-dim); }
+.cmd-results { padding: 0.4rem; max-height: 280px; overflow-y: auto; }
+.cmd-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.6rem 0.7rem; border-radius: 7px;
+  cursor: pointer; transition: background 0.1s;
+  font-size: 0.82rem;
+}
+.cmd-item:hover, .cmd-item.selected { background: rgba(90,158,111,0.1); }
+.cmd-item-icon { font-size: 0.9rem; width: 20px; text-align: center; }
+.cmd-item-name { color: var(--shell-txt); }
+.cmd-item-meta { margin-left: auto; font-size: 0.68rem; color: var(--shell-dim); font-family: var(--mono); }
+.cmd-footer {
+  padding: 0.5rem 1rem; border-top: 1px solid var(--shell-b);
+  display: flex; gap: 1.2rem;
+  font-size: 0.62rem; color: var(--shell-dim); font-family: var(--mono);
+}
+.cmd-footer span { display: flex; align-items: center; gap: 0.35rem; }
+.kbd {
+  background: var(--shell-s2); border: 1px solid var(--shell-b2);
+  border-radius: 3px; padding: 0.08rem 0.35rem; font-size: 0.6rem;
+}
+
+/* Resize handle indicator between sidebar and content */
+.sidebar-resize {
+  position: absolute; top: 0; right: -3px; width: 6px; height: 100%;
+  cursor: col-resize; z-index: 10;
+}
+</style>
+</head>
+<body>
+
+<div class="platform">
+
+  <!-- ══ GLOBAL TOPBAR ══ -->
+  <header class="g-topbar">
+    <div class="g-tb-left">
+      <div class="g-logo-block">
+        <div class="g-logo-mark" onclick="navigate('home')" title="Home">HB</div>
+      </div>
+      <div class="g-wordmark-block">
+        <span class="g-wordmark">Holiday <em>Bosnia</em></span>
+        <span class="g-platform-label">Ops Platform</span>
+      </div>
+      <div class="g-breadcrumb" id="breadcrumb">
+        <span>Platform</span>
+        <span class="sep">›</span>
+        <span class="current" id="breadcrumbCurrent">Overview</span>
+      </div>
+    </div>
+    <div class="g-tb-right">
+      <div class="g-search">
+        <span class="si">⌘</span>
+        <input type="text" placeholder="Search or jump to… (⌘K)" id="globalSearch" readonly onclick="openCmd()">
+      </div>
+      <div class="g-notif" onclick="toggleNotifications()" id="notifBtn">
+        🔔
+        <div class="badge" id="notifBadge">3</div>
+      </div>
+      <div class="g-status"><div class="g-status-dot"></div>AI Online</div>
+      <div class="g-avatar" title="Team account">HB</div>
+    </div>
+  </header>
+
+  <!-- ══ ICON RAIL ══ -->
+  <nav class="icon-rail">
+    <div class="ir-btn active" id="ir-home" data-tip="Overview" onclick="navigate('home')">🏠</div>
+    <div class="ir-sep"></div>
+    <div class="ir-btn" id="ir-planner"  data-tip="Trip Planner"  onclick="navigate('planner')">🗺</div>
+    <div class="ir-btn has-alert" id="ir-triage" data-tip="Inquiry Triage" onclick="navigate('triage')">
+      📥
+      <div class="ir-dot"></div>
+    </div>
+    <div class="ir-btn" id="ir-pricing"  data-tip="Pricing Agent" onclick="navigate('pricing')">📊</div>
+    <div class="ir-sep"></div>
+    <div class="ir-btn" data-tip="Website" onclick="openSite()">🌐</div>
+    <div class="ir-btn" data-tip="Settings">⚙️</div>
+  </nav>
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="ss-label">Customer</div>
+      <div class="nav-item" id="nav-planner" onclick="navigate('planner')">
+        <span class="ni-icon">🗺</span>
+        <span class="ni-label">Trip Planner</span>
+        <span class="nav-badge blue">AI</span>
+      </div>
+    </div>
+
+    <div class="nav-sep"></div>
+
+    <div class="sidebar-section">
+      <div class="ss-label">Operations</div>
+      <div class="nav-item active" id="nav-home" onclick="navigate('home')">
+        <span class="ni-icon">🏠</span>
+        <span class="ni-label">Overview</span>
+      </div>
+      <div class="nav-item" id="nav-triage" onclick="navigate('triage')">
+        <span class="ni-icon">📥</span>
+        <span class="ni-label">Inquiry Triage</span>
+        <span class="nav-badge red" id="triageBadge">2</span>
+      </div>
+      <div class="nav-item" id="nav-pricing" onclick="navigate('pricing')">
+        <span class="ni-icon">📊</span>
+        <span class="ni-label">Pricing Agent</span>
+        <span class="nav-badge amber" id="pricingBadge">!</span>
+      </div>
+    </div>
+
+    <div class="nav-sep"></div>
+
+    <div class="sidebar-section">
+      <div class="ss-label">Intelligence</div>
+      <div class="nav-item" onclick="">
+        <span class="ni-icon">📝</span>
+        <span class="ni-label">Impact Reports</span>
+      </div>
+      <div class="nav-item" onclick="">
+        <span class="ni-icon">📅</span>
+        <span class="ni-label">Tour Calendar</span>
+      </div>
+      <div class="nav-item" onclick="">
+        <span class="ni-icon">🌐</span>
+        <span class="ni-label">Translation</span>
+        <span class="nav-badge green">New</span>
+      </div>
+    </div>
+
+    <div class="nav-sep"></div>
+
+    <div class="sidebar-section">
+      <div class="ss-label">Settings</div>
+      <div class="nav-item" onclick="">
+        <span class="ni-icon">⚙️</span>
+        <span class="ni-label">Configuration</span>
+      </div>
+      <div class="nav-item" onclick="">
+        <span class="ni-icon">👥</span>
+        <span class="ni-label">Team</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sf-status">
+        <div class="sf-dot"></div>
+        <div>
+          <div style="font-size:0.72rem;color:rgba(245,240,232,0.65);font-weight:500">All systems operational</div>
+          <div style="font-size:0.65rem;color:var(--shell-dim);margin-top:1px">Claude · API connected</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ══ CONTENT ══ -->
+  <main class="content-area" id="contentArea">
+
+    <!-- HOME VIEW -->
+    <div class="view active" id="view-home">
+      <div class="home-view">
+
+        <div class="home-greeting">
+          <h1>Good morning, <em>Holiday Bosnia</em></h1>
+          <p>Here's your platform overview — 2 new inquiries, 1 pricing alert.</p>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="kpi-label">New Inquiries</div>
+            <div class="kpi-value">2</div>
+            <div class="kpi-delta">↑ 2 since yesterday</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Pending Replies</div>
+            <div class="kpi-value">3</div>
+            <div class="kpi-delta neutral">→ No change</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Grand Tour Occupancy</div>
+            <div class="kpi-value">89%</div>
+            <div class="kpi-delta down">⚠ Filling fast</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Avg. Response Time</div>
+            <div class="kpi-value">1.4h</div>
+            <div class="kpi-delta">↓ Down from 3.2h</div>
+          </div>
+        </div>
+
+        <!-- Tool launchers -->
+        <div style="font-size:0.63rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--shell-dim);margin-bottom:0.65rem">Quick launch</div>
+        <div class="launchers">
+          <div class="launcher planner" onclick="navigate('planner')">
+            <div class="launcher-icon">🗺</div>
+            <div>
+              <div class="launcher-name">AI Trip Planner</div>
+              <div class="launcher-desc">Customer-facing conversational itinerary builder powered by Claude. Share with prospective guests or use in live calls.</div>
+            </div>
+            <div class="launcher-meta">
+              <span class="launcher-badge">Customer</span>
+              <span class="launcher-arrow">→</span>
+            </div>
+          </div>
+          <div class="launcher triage" onclick="navigate('triage')">
+            <div class="launcher-icon">📥</div>
+            <div>
+              <div class="launcher-name">Inquiry Triage</div>
+              <div class="launcher-desc">AI classifies inbound inquiries by priority, trip type and urgency — then drafts personalised replies for your review.</div>
+            </div>
+            <div class="launcher-meta">
+              <span class="launcher-badge" style="color:var(--red);border-color:rgba(224,82,82,0.3)">2 new</span>
+              <span class="launcher-arrow">→</span>
+            </div>
+          </div>
+          <div class="launcher pricing" onclick="navigate('pricing')">
+            <div class="launcher-icon">📊</div>
+            <div>
+              <div class="launcher-name">Pricing Agent</div>
+              <div class="launcher-desc">Agentic AI monitors airline routes, accommodation occupancy and seasonal demand to flag pricing windows and fill risks.</div>
+            </div>
+            <div class="launcher-meta">
+              <span class="launcher-badge" style="color:var(--amber);border-color:rgba(212,162,74,0.3)">1 alert</span>
+              <span class="launcher-arrow">→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity + Alerts -->
+        <div class="home-cols">
+          <div class="hc-card">
+            <div class="hc-head">
+              <span>Recent Activity</span>
+              <span style="color:var(--green);cursor:pointer">View all</span>
+            </div>
+            <div class="hc-body">
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--red)"></div>
+                <div class="ai-text"><strong>Fatima Al-Rashid</strong> submitted a family inquiry — 10 days, halal</div>
+                <div class="ai-time">09:14</div>
+              </div>
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--red)"></div>
+                <div class="ai-text"><strong>James Whitmore</strong> asked about Feb half-term ski trip</div>
+                <div class="ai-time">07:52</div>
+              </div>
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--amber)"></div>
+                <div class="ai-text">Pricing agent flagged <strong>Grand Tour at 89%</strong> occupancy</div>
+                <div class="ai-time">06:30</div>
+              </div>
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--green)"></div>
+                <div class="ai-text"><strong>Dr. Amara Osei</strong> draft reply sent — solo 7-day trip</div>
+                <div class="ai-time">Yesterday</div>
+              </div>
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--green)"></div>
+                <div class="ai-text">Trip planner session: <strong>Gulf family, 14 days, halal</strong></div>
+                <div class="ai-time">Yesterday</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hc-card">
+            <div class="hc-head">
+              <span>Pricing Alerts</span>
+              <span style="color:var(--amber);cursor:pointer" onclick="navigate('pricing')">Open agent →</span>
+            </div>
+            <div class="hc-body">
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--red)"></div>
+                <div class="ai-text"><strong>Grand Tour filling fast</strong> — 89% booked. Review pricing or open second departure.</div>
+                <div class="ai-time">High</div>
+              </div>
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--amber)"></div>
+                <div class="ai-text"><strong>Classic Tour</strong> at 71% — £70pp increase recommended vs competitors.</div>
+                <div class="ai-time">Med</div>
+              </div>
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--blue)"></div>
+                <div class="ai-text"><strong>FlyNas Gulf route</strong> fares rising — signals strong Gulf demand. Consider Arabic push.</div>
+                <div class="ai-time">Info</div>
+              </div>
+              <div class="activity-item">
+                <div class="ai-dot" style="background:var(--green)"></div>
+                <div class="ai-text"><strong>April booking window</strong> — Wizz Air fares from £89. Ideal for shoulder season campaigns.</div>
+                <div class="ai-time">Opp</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TRIP PLANNER VIEW -->
+    <div class="view" id="view-planner">
+      <iframe src="trip-planner.html" id="iframe-planner"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+        title="Trip Planner"></iframe>
+    </div>
+
+    <!-- INQUIRY TRIAGE VIEW -->
+    <div class="view" id="view-triage">
+      <iframe src="inquiry-triage.html" id="iframe-triage"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+        title="Inquiry Triage"></iframe>
+    </div>
+
+    <!-- PRICING AGENT VIEW -->
+    <div class="view" id="view-pricing">
+      <iframe src="pricing-agent.html" id="iframe-pricing"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+        title="Pricing Agent"></iframe>
+    </div>
+
+  </main>
+
+  <!-- ══ STATUS BAR ══ -->
+  <div class="statusbar">
+    <div class="sb-item"><div class="sb-dot green"></div>Claude API</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item"><div class="sb-dot green"></div>Trip Planner</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item"><div class="sb-dot green"></div>Triage Engine</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item"><div class="sb-dot amber"></div>Pricing Agent — run needed</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item sb-right" id="sbTime"></div>
+  </div>
+
+</div>
+
+<!-- ══ NOTIFICATION DRAWER ══ -->
+<div class="notif-drawer" id="notifDrawer">
+  <div class="nd-head">
+    <div class="nd-title">Notifications</div>
+    <button class="nd-close" onclick="toggleNotifications()">✕</button>
+  </div>
+  <div class="nd-body">
+    <div class="nd-item" onclick="navigate('triage');toggleNotifications()">
+      <div class="nd-item-type alert">Fill Alert</div>
+      <div class="nd-item-body"><strong>Grand Tour at 89% capacity</strong> — immediate pricing action recommended</div>
+      <div class="nd-item-time">06:30 today</div>
+    </div>
+    <div class="nd-item" onclick="navigate('triage');toggleNotifications()">
+      <div class="nd-item-type info">New Inquiry</div>
+      <div class="nd-item-body"><strong>Fatima Al-Rashid</strong> — Family of 5, 10 days, halal requirements</div>
+      <div class="nd-item-time">09:14 today</div>
+    </div>
+    <div class="nd-item" onclick="navigate('triage');toggleNotifications()">
+      <div class="nd-item-type info">New Inquiry</div>
+      <div class="nd-item-body"><strong>James Whitmore</strong> — Group ski trip, Feb half term</div>
+      <div class="nd-item-time">07:52 today</div>
+    </div>
+    <div class="nd-item" onclick="navigate('pricing');toggleNotifications()">
+      <div class="nd-item-type price">Pricing Window</div>
+      <div class="nd-item-body"><strong>April booking window</strong> — Wizz Air from £89pp, 35% below peak fares</div>
+      <div class="nd-item-time">Yesterday</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMMAND PALETTE ══ -->
+<div class="cmd-backdrop" id="cmdBackdrop" onclick="closeCmd()">
+  <div class="cmd-box" onclick="event.stopPropagation()">
+    <div class="cmd-input-wrap">
+      <span>⌘</span>
+      <input class="cmd-input" id="cmdInput" placeholder="Search or jump to…" oninput="filterCmd(this.value)" onkeydown="cmdKeydown(event)" autofocus>
+    </div>
+    <div class="cmd-results" id="cmdResults"></div>
+    <div class="cmd-footer">
+      <span><span class="kbd">↑↓</span> navigate</span>
+      <span><span class="kbd">↵</span> open</span>
+      <span><span class="kbd">Esc</span> close</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+var currentView = 'home';
+var notifOpen = false;
+var cmdOpen = false;
+var cmdSelected = 0;
+
+var CMD_ITEMS = [
+  { icon:'🏠', name:'Overview',           meta:'home',    action: function(){navigate('home');} },
+  { icon:'🗺', name:'Trip Planner',       meta:'customer',action: function(){navigate('planner');} },
+  { icon:'📥', name:'Inquiry Triage',     meta:'ops',     action: function(){navigate('triage');} },
+  { icon:'📊', name:'Pricing Agent',      meta:'ops',     action: function(){navigate('pricing');} },
+  { icon:'📅', name:'Tour Calendar',      meta:'coming soon', action: function(){} },
+  { icon:'📝', name:'Impact Reports',     meta:'coming soon', action: function(){} },
+  { icon:'🌐', name:'View Public Site',   meta:'external',action: function(){openSite();} },
+  { icon:'⚙️', name:'Settings',          meta:'platform',action: function(){} },
+];
+
+var filteredItems = CMD_ITEMS.slice();
+
+// ── NAVIGATION ──
+function navigate(view) {
+  // Hide all views
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  document.getElementById('view-' + view).classList.add('active');
+
+  // Update sidebar nav
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  var ni = document.getElementById('nav-' + view);
+  if (ni) ni.classList.add('active');
+
+  // Update icon rail
+  document.querySelectorAll('.ir-btn').forEach(function(b){ b.classList.remove('active'); });
+  var ib = document.getElementById('ir-' + view);
+  if (ib) ib.classList.add('active');
+
+  // Update breadcrumb
+  var names = {home:'Overview', planner:'Trip Planner', triage:'Inquiry Triage', pricing:'Pricing Agent'};
+  document.getElementById('breadcrumbCurrent').textContent = names[view] || view;
+
+  // Clear badge on triage when opened
+  if (view === 'triage') {
+    document.getElementById('triageBadge').style.display = 'none';
+    var ib2 = document.getElementById('ir-triage');
+    if (ib2) ib2.classList.remove('has-alert');
+  }
+
+  // Update status bar
+  updateStatusBar(view);
+
+  currentView = view;
+  closeCmd();
+}
+
+function openSite() {
+  window.open('holidaybosnia-redesign.html', '_blank');
+}
+
+// ── STATUS BAR ──
+function updateStatusBar(view) {
+  // Could highlight which tool is active
+}
+
+function updateClock() {
+  var now = new Date();
+  var t = now.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  var d = now.toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short'});
+  var el = document.getElementById('sbTime');
+  if (el) el.textContent = d + ' · ' + t;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── NOTIFICATIONS ──
+function toggleNotifications() {
+  notifOpen = !notifOpen;
+  document.getElementById('notifDrawer').classList.toggle('open', notifOpen);
+}
+
+// ── COMMAND PALETTE ──
+function openCmd() {
+  cmdOpen = true;
+  document.getElementById('cmdBackdrop').classList.add('open');
+  filteredItems = CMD_ITEMS.slice();
+  cmdSelected = 0;
+  renderCmdResults();
+  setTimeout(function(){ document.getElementById('cmdInput').focus(); }, 50);
+}
+
+function closeCmd() {
+  cmdOpen = false;
+  document.getElementById('cmdBackdrop').classList.remove('open');
+  document.getElementById('cmdInput').value = '';
+}
+
+function filterCmd(q) {
+  var lq = (q || '').toLowerCase();
+  filteredItems = lq ? CMD_ITEMS.filter(function(i){
+    return i.name.toLowerCase().includes(lq) || i.meta.toLowerCase().includes(lq);
+  }) : CMD_ITEMS.slice();
+  cmdSelected = 0;
+  renderCmdResults();
+}
+
+function renderCmdResults() {
+  var html = filteredItems.map(function(item, i) {
+    return [
+      '<div class="cmd-item' + (i === cmdSelected ? ' selected' : '') + '" onclick="runCmd(' + i + ')">',
+        '<span class="cmd-item-icon">' + item.icon + '</span>',
+        '<span class="cmd-item-name">' + item.name + '</span>',
+        '<span class="cmd-item-meta">' + item.meta + '</span>',
+      '</div>'
+    ].join('');
+  }).join('');
+  document.getElementById('cmdResults').innerHTML = html || '<div style="padding:1rem;text-align:center;font-size:0.78rem;color:var(--shell-dim)">No results</div>';
+}
+
+function runCmd(i) {
+  var item = filteredItems[i];
+  if (item) { item.action(); closeCmd(); }
+}
+
+function cmdKeydown(e) {
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdSelected = Math.min(cmdSelected + 1, filteredItems.length - 1); renderCmdResults(); }
+  if (e.key === 'ArrowUp')   { e.preventDefault(); cmdSelected = Math.max(cmdSelected - 1, 0); renderCmdResults(); }
+  if (e.key === 'Enter')     { runCmd(cmdSelected); }
+  if (e.key === 'Escape')    { closeCmd(); }
+}
+
+// Global keyboard shortcut
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCmd(); }
+  if (e.key === 'Escape' && cmdOpen) closeCmd();
+  if (e.key === 'Escape' && notifOpen) toggleNotifications();
+});
+
+// Expose
+window.navigate = navigate;
+window.openSite = openSite;
+window.openCmd = openCmd;
+window.closeCmd = closeCmd;
+window.filterCmd = filterCmd;
+window.cmdKeydown = cmdKeydown;
+window.runCmd = runCmd;
+window.toggleNotifications = toggleNotifications;
+</script>
+</body>
+</html>
