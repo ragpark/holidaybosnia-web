@@ -81,9 +81,10 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
+    console.error('Planner handoff failed', error);
     return NextResponse.json(
-      { error: { code: 'PLANNER_HANDOFF_ERROR', message: error instanceof Error ? error.message : 'Unknown error' } },
-      { status: 500 },
+      { error: { code: 'PLANNER_HANDOFF_ERROR', message: 'Unable to create handoff itinerary right now.' } },
+      { status: 502 },
     );
   }
 }

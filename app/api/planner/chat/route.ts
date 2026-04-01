@@ -57,9 +57,10 @@ export async function POST(req: Request) {
       usage: reply.usage,
     });
   } catch (error) {
+    console.error('Planner chat failed', error);
     return NextResponse.json(
-      { error: { code: 'PLANNER_CHAT_ERROR', message: error instanceof Error ? error.message : 'Unknown error' } },
-      { status: 500 },
+      { error: { code: 'PLANNER_CHAT_ERROR', message: 'Unable to generate a planner response right now.' } },
+      { status: 502 },
     );
   }
 }
