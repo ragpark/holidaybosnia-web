@@ -669,6 +669,7 @@ TONE:
 Warm, knowledgeable, personal. Never pushy. Treat every traveller as an individual. Show genuine enthusiasm for Bosnia's culture, landscape, and people.`;
 
 let history = [];
+let plannerSessionId = null;
 let isLoading = false;
 
 function autoResize(el) {
@@ -776,21 +777,25 @@ async function sendMessage() {
   showTyping();
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/planner/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: history
+        sessionId: plannerSessionId,
+        message: text,
+        context: { source: 'web', locale: 'en-GB' }
       })
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data?.error?.message || 'Planner request failed');
+    }
+
+    plannerSessionId = data.sessionId;
     hideTyping();
 
-    const reply = data.content?.find(b => b.type === 'text')?.text || "I'm sorry, I couldn't generate a response. Please try again.";
+    const reply = data?.assistantMessage?.content || "I'm sorry, I couldn't generate a response. Please try again.";
     history.push({ role: 'assistant', content: reply });
     addMessage('assistant', reply);
     showHandoffButton();
@@ -817,6 +822,7 @@ function setLoading(val) {
 
 function resetChat() {
   history = [];
+  plannerSessionId = null;
   const messages = document.getElementById('messages');
   messages.innerHTML = '';
 
@@ -883,45 +889,28 @@ async function generateAndSend() {
 
   showState('generating');
 
-  // Build conversation transcript for summarisation
-  const transcript = history.map(m =>
-    (m.role === 'user' ? 'TRAVELLER: ' : 'PLANNER: ') + m.content
-  ).join('\n\n');
-
-  const summaryPrompt = `You are writing a professional travel itinerary email on behalf of Holiday Bosnia.
-
-Based on this planning conversation, write a complete, beautifully formatted email itinerary ready to send to the traveller.
-
-TRAVELLER NAME: ${name}
-ADDITIONAL NOTES FROM TRAVELLER: ${notes || 'None'}
-
-CONVERSATION:
-${transcript}
-
-Write the email with:
-1. A warm personal greeting using their name
-2. A brief summary of what was discussed and what we understood their trip to be
-3. The full day-by-day itinerary clearly formatted with Days, locations, activities and meal suggestions
-4. Accommodation style recommendations
-5. Practical notes (what to pack, best transport, halal food availability if relevant)
-6. The recommended Holiday Bosnia package and next steps
-7. A warm sign-off from the Holiday Bosnia team with contact details: info@holidaybosnia.com | www.holidaybosnia.com
-
-Format it clearly with section headers. Use plain text (no markdown symbols like ** or ##) since this will be sent as an email. Keep it warm, personal and professional.`;
-
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    if (!plannerSessionId) {
+      throw new Error('Start a conversation first so we can generate your itinerary.');
+    }
+
+    const response = await fetch('/api/planner/handoff', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: summaryPrompt }]
+        sessionId: plannerSessionId,
+        guestName: name,
+        guestEmail: email,
+        notes: notes || undefined
       })
     });
 
     const data = await response.json();
-    const emailBody = data.content?.find(b => b.type === 'text')?.text || 'Please see your itinerary details below.';
+    if (!response.ok) {
+      throw new Error(data?.error?.message || 'Failed to generate itinerary.');
+    }
+
+    const emailBody = data?.itineraryText || 'Please see your itinerary details below.';
     generatedEmailBody = emailBody;
 
     // Show success preview
