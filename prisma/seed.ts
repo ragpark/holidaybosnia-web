@@ -113,28 +113,31 @@ async function main() {
   ];
 
   for (const seed of inquirySeeds) {
-    const inquiry = await prisma.inquiry.upsert({
-      where: {
-        senderEmail_subject: {
-          senderEmail: seed.senderEmail,
-          subject: seed.subject,
-        },
-      } as any,
-      update: {
-        body: seed.body,
-        unread: seed.unread,
-        status: seed.status,
-      },
-      create: {
-        source: seed.source,
-        senderName: seed.senderName,
-        senderEmail: seed.senderEmail,
-        subject: seed.subject,
-        body: seed.body,
-        unread: seed.unread,
-        status: seed.status,
-      },
+    const existing = await prisma.inquiry.findFirst({
+      where: { senderEmail: seed.senderEmail, subject: seed.subject },
+      select: { id: true },
     });
+
+    const inquiry = existing
+      ? await prisma.inquiry.update({
+          where: { id: existing.id },
+          data: {
+            body: seed.body,
+            unread: seed.unread,
+            status: seed.status,
+          },
+        })
+      : await prisma.inquiry.create({
+          data: {
+            source: seed.source,
+            senderName: seed.senderName,
+            senderEmail: seed.senderEmail,
+            subject: seed.subject,
+            body: seed.body,
+            unread: seed.unread,
+            status: seed.status,
+          },
+        });
 
     await prisma.triageResult.upsert({
       where: { inquiryId: inquiry.id },
