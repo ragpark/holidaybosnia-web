@@ -1,11 +1,5 @@
 {
-  cleanUrls true,
-  trailingSlash false,
-  routes [
-    { src dashboard,    dest dashboard.html },
-    { src planner,      dest trip-planner.html },
-    { src triage,       dest inquiry-triage.html },
-    { src pricing,      dest pricing-agent.html },
-    { src (.),         dest $1 }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false
 }
